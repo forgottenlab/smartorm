@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.smartorm</groupId>
+    <artifactId>SmartOrm</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>SmartOrm</name>
+
+    <properties>
+        <project.mybatis-plus.version>3.5.14</project.mybatis-plus.version>
+        <project.spring-boot.version>3.5.5</project.spring-boot.version>
+        <project.mysql-connector.version>9.4.0</project.mysql-connector.version>
+    </properties>
+
+    <dependencies>
+        <!-- mybatis-plus -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>${project.mybatis-plus.version}</version>
+        </dependency>
+
+        <!-- mybatis-plus 分页插件 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <version>${project.mybatis-plus.version}</version>
+        </dependency>
+
+        <!-- Spring Boot Starter（包含所有Spring核心） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${project.spring-boot.version}</version>
+        </dependency>
+
+        <!-- Spring Boot Web (用于测试) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${project.spring-boot.version}</version>
+        </dependency>
+
+        <!-- MySQL -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${project.mysql-connector.version}</version>
+        </dependency>
+
+        <!-- 测试 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${project.spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${project.spring-boot.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
