@@ -122,7 +122,7 @@ ORDER BY create_time DESC
 LIMIT 10
 ```
 
-#### ✔ 自动 INSERT
+#### ✔ 自动拼接 INSERT
 
 ```java
 @SmartInsert(
@@ -134,7 +134,7 @@ default int insertUser(String userName, Integer age, Integer status) {
 }
 ```
 
-#### ✔ 自动 UPDATE
+#### ✔ 自动拼接 UPDATE
 
 ```java
 @SmartUpdate(
@@ -149,7 +149,7 @@ default int updateUserStatus(Integer status, Long id) {
 }
 ```
 
-#### ✔ 自动 DELETE
+#### ✔ 自动拼接 DELETE
 
 ```java
 @SmartDelete(where = "id = #{0}")
