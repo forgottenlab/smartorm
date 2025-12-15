@@ -9,7 +9,15 @@
 
     <name>SmartOrm</name>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.5</version>
+    </parent>
+
+
     <properties>
+        <java.version>17</java.version>
         <project.mybatis-plus.version>3.5.14</project.mybatis-plus.version>
         <project.spring-boot.version>3.5.5</project.spring-boot.version>
         <project.mysql-connector.version>9.4.0</project.mysql-connector.version>
@@ -35,6 +43,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <version>${project.spring-boot.version}</version>
+        </dependency>
+
+        <!-- Spring AOP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <version>${project.spring-boot.version}</version>
+            <!-- 确保依赖不会被传递，TODO：后续最好能做到其中的所有依赖都不被传递 -->
+            <scope>provided</scope>
         </dependency>
 
         <!-- Spring Boot Web (用于测试) -->

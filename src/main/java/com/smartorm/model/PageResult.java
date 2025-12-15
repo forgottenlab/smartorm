@@ -3,8 +3,8 @@ package com.smartorm.model;
 import java.util.List;
 
 /**
- * @author <a href="#">Forgotten.</a>
- * @Details [简述]
+ * @author <a href="wangheran55@gmail.com">Forgotten.</a>
+ * @Details 简单分页实体类
  * @CreateDate 2025/11/25
  * @LastModified 2025/11/25
  * @VersionHistory [版本历史]

@@ -3,7 +3,7 @@ package com.smartorm.annotation;
 import java.lang.annotation.*;
 
 /**
- * @author <a href="#">Forgotten.</a>
+ * @author <a href="wangheran55@gmail.com">Forgotten.</a>
  * @Details 智能删除注解
  * @CreateDate 2025/11/25
  * @LastModified 2025/11/25

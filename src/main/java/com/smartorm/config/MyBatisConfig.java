@@ -7,18 +7,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author <a href="#">Forgotten.</a>
+ * @author <a href="wangheran55@gmail.com">Forgotten.</a>
  * @Details MyBatis配置类（引入MybatisPlus的分页插件）
  * @CreateDate 2025/11/25
  * @LastModified 2025/11/25
  * @VersionHistory [版本历史]
  */
 @Configuration
-@MapperScan("com.smartorm") // 扫描包含Mapper的包
+@MapperScan(basePackages = {
+        "com.smartorm._demo.mapper",  // 业务 Mapper
+})
 public class MyBatisConfig {
-    /**
-     * MyBatis-Plus 插件配置
-     */
+
+    /**  MyBatis-Plus 插件配置 */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();

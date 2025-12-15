@@ -1,32 +1,25 @@
 package com.smartorm._demo.mapper;
 
 import com.smartorm._demo.entiey.User;
-import com.smartorm.annotation.*;
 import com.smartorm.mapper.SmartMapper;
+import com.smartorm.annotation.*;
 import com.smartorm.model.PageResult;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 /**
- * @author <a href="#">Forgotten.</a>
- * @Details 用户数据访问层接口
+ * @author <a href="wangheran55@gmail.com">Forgotten.</a>
+ * @Details UserMapper - 用户数据访问层接口
  * @CreateDate 2025/11/25
  * @LastModified 2025/11/25
- * @VersionHistory [版本历史]
  */
-@Mapper
 public interface UserMapper extends SmartMapper<User> {
 
-    // TODO:待优化方法的调用的代码
+    /* ============================================================
+     *                      SmartSelect
+     * ============================================================ */
 
-    /**
-     * 查询 -- 活跃用户列表（按年龄筛选）
-     *
-     * @param minAge 最小年龄
-     * @param status 用户状态
-     * @return 用户列表
-     */
+    /** 查询年龄大于指定值且状态匹配的活跃用户列表（按创建时间降序，最多10条） */
     @SmartSelect(
             fields = {"id", "user_name", "age", "status"},
             where = "age > #{0} AND status = #{1}",
@@ -34,45 +27,52 @@ public interface UserMapper extends SmartMapper<User> {
             desc = true,
             limit = 10
     )
-    default List<User> findActiveUsersByAge(Integer minAge, Integer status) {
-        return findByAnnotation("findActiveUsersByAge", new Object[]{minAge, status});
-    }
+    List<User> findActiveUsersByAge(Integer minAge, Integer status);
 
-    /**
-     * 查询 -- 用户列表（按用户名模糊匹配）
-     *
-     * @param userName 用户名（支持模糊匹配）
-     * @return 用户列表
-     */
+    /** 根据年龄倒序查询第一条用户信息 */
+    // TODO : 错误
     @SmartSelect(
-            fields = {"id", "user_name", "age"},
+//            orderBy = "age",
+//            desc = true,
+            limit = 1
+    )
+    User findUserOrderByAgeLimit1();
+
+    /** 根据用户名字段进行模糊匹配查询 */
+    // TODO:后续待优化CONCAT('%', #{0}, '%')应该无需用户自己输入,用户只需要正常写sql语句例如 like '%xxx%'然后工具自己解析
+    @SmartSelect(
+//            fields = {"id", "user_name", "age"}, // 不写默认是全部字段
             where = "user_name LIKE CONCAT('%', #{0}, '%')",
             orderBy = "age"
     )
-    default List<User> findUsersByName(String userName) {
-        return findByAnnotation("findUsersByName", new Object[]{userName});
-    }
+    List<User> findUsersByName(String userName);
 
-    /**
-     * 查询 -- 用户信息（按ID）
-     *
-     * @param id 用户ID
-     * @return 用户信息
-     */
+    /** 根据ID精确查询单个用户 */
     @SmartSelect(
             where = "id = #{0}",
             limit = 1
     )
-    default User findUserById(Long id) {
-        return findOneByAnnotation("findUserById", new Object[]{id});
-    }
+    User findUserById(Long id);
 
-    /**
-     * 分页查询 -- 用户列表（按状态）
-     *
-     * @param status 用户状态
-     * @return 分页结果
-     */
+    /** 多条件组合查询：年龄、状态及用户名的模糊匹配 */
+    @SmartSelect(
+            fields = {"id", "user_name", "age", "status"},
+            where = "age > #{0} AND status = #{1} AND user_name LIKE CONCAT('%', #{2}, '%')",
+            orderBy = "create_time"
+    )
+    List<User> findComplexUsers(Integer minAge, Integer status, String userName);
+
+    /** 查询状态匹配且在最近30天内有创建记录的活跃用户 */
+    @SmartSelect(
+            where = "status = #{0} AND create_time > DATE_SUB(NOW(), INTERVAL 30 DAY)"
+    )
+    List<User> findRecentActiveUsers(Integer status);
+
+    /* ============================================================
+     *                      SmartPage
+     * ============================================================ */
+
+    /** 根据用户状态进行分页查询（按创建时间降序，每页20条）*/
     @SmartPage(
             fields = {"id", "user_name", "age", "create_time"},
             where = "status = #{0}",
@@ -80,145 +80,106 @@ public interface UserMapper extends SmartMapper<User> {
             desc = true,
             pageSize = 20
     )
-    default PageResult<User> findUsersByStatusPage(Integer status) {
-        return findByPageAnnotation("findUsersByStatusPage", new Object[]{status});
-    }
+    PageResult<User> findUsersByStatusPage(Integer status);
 
-    /**
-     * 分页查询 -- 用户列表（按年龄范围）
-     *
-     * @param minAge 最小年龄
-     * @param maxAge 最大年龄
-     * @return 分页结果
-     */
+    /** 查询年龄在指定范围内的用户分页列表（按年龄升序，每页15条，从第1页开始） */
     @SmartPage(
             where = "age BETWEEN #{0} AND #{1}",
             orderBy = "age",
             page = 1,
             pageSize = 15
     )
-    default PageResult<User> findUsersByAgeRangePage(Integer minAge, Integer maxAge) {
-        return findByPageAnnotation("findUsersByAgeRangePage", new Object[]{minAge, maxAge});
-    }
+    PageResult<User> findUsersByAgeRangePage(Integer minAge, Integer maxAge);
 
-    /**
-     * 新增 -- 用户信息
-     *
-     * @param userName 用户名
-     * @param age 年龄
-     * @param status 状态
-     * @return 影响行数
-     */
+    /** 根据关键词（模糊匹配用户名）和状态进行分页查询（按创建时间降序，每页10条，从第1页开始） */
+    @SmartPage(
+            fields = {"id", "user_name", "age", "status", "create_time"},
+            where = "user_name LIKE CONCAT('%', #{0}, '%') AND status = #{1}",
+            orderBy = "create_time",
+            desc = true,
+            page = 1,
+            pageSize = 10
+    )
+    PageResult<User> searchUsersPage(String keyword, Integer status);
+
+
+    /* ============================================================
+     *                      SmartInsert
+     * ============================================================ */
+
+    /** 插入一个包含用户名、年龄和状态的完整新用户 */
     @SmartInsert(
             fields = {"user_name", "age", "status"},
             values = {"#{0}", "#{1}", "#{2}"}
     )
-    default int insertUser(String userName, Integer age, Integer status) {
-        return insertByAnnotation("insertUser", new Object[]{userName, age, status});
-    }
+    int insertUser(String userName, Integer age, Integer status);
 
-    /**
-     * 新增 -- 简单用户信息（只包含用户名和年龄）
-     *
-     * @param userName 用户名
-     * @param age 年龄
-     * @return 影响行数
-     */
+    /** 插入一个仅包含用户名和年龄的简单新用户（状态字段依赖数据库默认值） */
     @SmartInsert(
             fields = {"user_name", "age"},
             values = {"#{0}", "#{1}"}
     )
-    default int insertSimpleUser(String userName, Integer age) {
-        return insertByAnnotation("insertSimpleUser", new Object[]{userName, age});
-    }
+    int insertSimpleUser(String userName, Integer age);
+
+    /** 插入一个用户，并为其状态字段显式设置默认值 1 */
+    @SmartInsert(
+            fields = {"user_name", "age", "status"},
+            values = {"#{0}", "#{1}", "1"}
+    )
+    int insertUserWithDefaultStatus(String userName, Integer age);
 
 
-    /**
-     * 更新 -- 用户姓名和年龄
-     *
-     * @param userName 新用户名
-     * @param age 新年龄
-     * @param id 用户ID
-     * @return 影响行数
-     */
+    /* ============================================================
+     *                      SmartUpdate
+     * ============================================================ */
+
+    /** 根据用户ID，更新其用户名和年龄 */
     @SmartUpdate(
             fields = {"user_name", "age"},
             values = {"#{0}", "#{1}"},
             where = "id = #{2}"
     )
-    default int updateUserNameAndAge(String userName, Integer age, Long id) {
-        User user = new User();
-        user.setUserName(userName);
-        user.setAge(age);
-        return updateByAnnotation("updateUserNameAndAge", user, new Object[]{userName, age, id});
-    }
+    int updateUserNameAndAge(String userName, Integer age, Long id);
 
-    /**
-     * 更新 -- 用户状态
-     *
-     * @param status 新状态
-     * @param id 用户ID
-     * @return 影响行数
-     */
+    /** 根据用户ID，更新其状态 */
     @SmartUpdate(
             fields = {"status"},
             values = {"#{0}"},
             where = "id = #{1}"
     )
-    default int updateUserStatus(Integer status, Long id) {
-        User user = new User();
-        user.setStatus(status);
-        return updateByAnnotation("updateUserStatus", user, new Object[]{status, id});
-    }
+    int updateUserStatus(Integer status, Long id);
 
-    /**
-     * 更新 -- 递增用户年龄（特殊）
-     *
-     * @param increment 递增数值
-     * @param id 用户ID
-     * @return 影响行数
-     */
+    /** 根据用户ID，将其年龄字段递增指定的数值（使用 SQL 表达式） */
     @SmartUpdate(
             fields = {"age"},
             values = {"age + #{0}"},
             where = "id = #{1}"
     )
-    default int incrementAge(Integer increment, Long id) {
-        User user = new User();
-        return updateByAnnotation("incrementAge", user, new Object[]{increment, id});
-    }
+    int incrementAge(Integer increment, Long id);
 
-    /**
-     * 删除 -- 用户（按ID）
-     *
-     * @param id 用户ID
-     * @return 影响行数
-     */
+    /** 将年龄大于指定值的所有用户的状态批量更新为新值 */
+    @SmartUpdate(
+            fields = {"status"},
+            values = {"#{0}"},
+            where = "age > #{1}"
+    )
+    int updateStatusForOldUsers(Integer status, Integer minAge);
+
+
+    /* ============================================================
+     *                      SmartDelete
+     * ============================================================ */
+
+    /** 根据用户ID删除指定用户 */
     @SmartDelete(where = "id = #{0}")
-    default int deleteUserById(Long id) {
-        return deleteByAnnotation("deleteUserById", new Object[]{id});
-    }
+    int deleteUserById(Long id);
 
-    /**
-     * 删除 -- 非活跃的年轻用户
-     *
-     * @param status 状态条件
-     * @param maxAge 最大年龄
-     * @return 影响行数
-     */
+    /** 删除状态匹配且年龄小于指定值的年轻非活跃用户 */
     @SmartDelete(where = "status = #{0} AND age < #{1}")
-    default int deleteInactiveYoungUsers(Integer status, Integer maxAge) {
-        return deleteByAnnotation("deleteInactiveYoungUsers", new Object[]{status, maxAge});
-    }
+    int deleteInactiveYoungUsers(Integer status, Integer maxAge);
 
-    /**
-     * 删除 -- 用户（按用户名）
-     *
-     * @param userName 用户名
-     * @return 影响行数
-     */
+    /** 根据精确的用户名删除用户 */
     @SmartDelete(where = "user_name = #{0}")
-    default int deleteUserByName(String userName) {
-        return deleteByAnnotation("deleteUserByName", new Object[]{userName});
-    }
+    int deleteUserByName(String userName);
+
 }

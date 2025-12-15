@@ -1,28 +1,32 @@
 package com.smartorm.resover;
 
 import com.smartorm.annotation.SmartInsert;
+import com.smartorm.resover.meta.InsertMeta;
+
+import java.lang.reflect.Method;
 
 /**
- * @author <a href="#">Forgotten.</a>
- * @Details 注解 @SmartInsert的解析器
+ * @author <a href="wangheran55@gmail.com">Forgotten.</a>
+ * @Details @SmartInsert注解解析器
  * @CreateDate 2025/11/25
- * @LastModified 2025/11/25
- * @VersionHistory [版本历史]
+ * @LastModified 2025/12/10
+ * @VersionHistory
+ * v1.0.0 2025/11/25
+ * - 初始版本：对 @SmartInsert 注解的相关信息进行解析<br>
+ * v2.0.0 2025/12/10
+ * - 版本更迭：将所有解释器中公共的代码提取到 SmartResolverBase 中<br>
  */
-public class SmartInsertResolver {
+public class SmartInsertResolver extends SmartBaseResolver {
 
-    public static class InsertMeta {
-
-        public String[] fields;
-        public String[] values;
-        public Class<?> entityClass;
-    }
-
-    public static InsertMeta resolve(SmartInsert annotation,Class<?> entityClass) {
+    /** 解析 @SmartInsert 注解并生成对应 Meta */
+    public static InsertMeta resolve(Method method, SmartInsert ann, Class<?> mapperInterface) {
         InsertMeta meta = new InsertMeta();
-        meta.entityClass = entityClass;
-        meta.fields = annotation.fields();
-        meta.values = annotation.values();
+        fillCommonMeta(meta, method, mapperInterface);
+
+        meta.fields = ann.fields();
+        meta.values = ann.values();
+
         return meta;
     }
+
 }

@@ -1,146 +1,155 @@
 package com.smartorm.util;
 
-import java.lang.reflect.Field;
-
 /**
- * @author <a href="#">Forgotten.</a>
- * @Details 解析注解中表达式的工具类
- * @CreateDate 2025/11/25
- * @LastModified 2025/11/25
- * @VersionHistory [版本历史]
+ * @author <a href="wangheran55@gmail.com">Forgotten.</a>
+ * @Details
+ * Smart 表达式工具类<br>
+ * 用于解析 Smart 注解中的值表达式，支持 #{index} 参数占位、数字字面量、字符串字面量等<br>
+ * 并可将表达式安全地转换为 SQL 可执行片段<br>
+ * 该工具类主要用于：<br>
+ * - SmartSelect / SmartInsert / SmartUpdate / SmartDelete<br>
+ * - where、values 等表达式的解析与填充
+ * @CreateDate 2025/12/09
+ * @LastModified 2025/12/09
+ * @VersionHistory
+ * v1.0.0 2025/12/09
+ * -为解决 Smart 注解中值表达式解析混乱问题而创建
  */
-public class SmartExpressionUtil {
+public final class SmartExpressionUtil {
+
+    /** 工具类禁止实例化 */
+    private SmartExpressionUtil(){}
 
     /**
-     * 解析 -- 单个表达式为 Java 对象<br><br>
-     *
-     * 将单个表达式解析为 Java 对象（用于 set(...) 的值）<br><br>
-     * 支持：<br>
-     * 1.#{0}           -> args[0]<br>
-     * 2.#{0.name}      -> read property "name" of args[0]<br>
-     * 3.'literal'      -> String literal<br>
-     * 4.数字            -> Integer<br>
-     * 5.其它直接返回字符串
+     * 解析单个值表达式为 Java 对象<br>
+     * 支持的表达式格式：
+     * 1.#{n} → 方法参数 args[n]<br>
+     * 2.整数（支持负数） → Integer<br>
+     * 3.小数（支持负数） → Double<br>
+     * 4.'字符串' → String<br>
+     * 5.其它 → 原样返回（SQL 表达式）<br>
+     * 示例：<br>
+     * <pre>
+     * #{0} -> args[0]
+     * 'abc' -> "abc"
+     * 10 -> 10
+     * age + 1 -> "age + 1"
+     * </pre>
+     * @param expr 表达式字符串（如 "#{0}"、"'abc'"、"10"）
+     * @param args 方法参数数组
+     * @return 解析后的 Java 值
      */
-    public static Object parse(String expr, Object[] args) {
+    public static Object parseValueExpression(String expr, Object[] args) {
         if (expr == null) return null;
         expr = expr.trim();
 
-        // #{0} 或 #{0.prop}
+        // 1. #{n} → args[n]
         if (expr.startsWith("#{") && expr.endsWith("}")) {
-            String inner = expr.substring(2, expr.length() - 1).trim(); // 例如 #{0} 或 #{0.name}
-
-            // 带属性访问
-            if (inner.contains(".")) {
-                String[] parts = inner.split("\\.", 2);
-                int idx = Integer.parseInt(parts[0]);
-                Object param = args[idx];
-                String prop = parts[1];
-
-                // 关键代码：读取对象属性值
-                return readFieldValue(param, prop);
-            } else {
-                int idx = Integer.parseInt(inner);
-                return args[idx];
+            String inner = expr.substring(2, expr.length() - 1).trim();
+            if (inner.matches("\\d+")) {
+                int index = Integer.parseInt(inner);
+                // 参数越界保护
+                return (args != null && index < args.length) ? args[index] : null;
             }
         }
 
-        // 'literal' 字符串
-        if (expr.startsWith("'") && expr.endsWith("'") && expr.length() >= 2) {
+        // 2. '字符串'
+        if (expr.startsWith("'") && expr.endsWith("'")) {
             return expr.substring(1, expr.length() - 1);
         }
 
-        // 整数数字
+        // 3. 数字（支持负数）
         if (expr.matches("-?\\d+")) {
-            try {
-                return Integer.parseInt(expr);
-            } catch (NumberFormatException ignored) {}
+            return Integer.parseInt(expr);
         }
 
-        // 默认返回原字符串
+        // 4. 小数（支持负数）
+        if (expr.matches("-?\\d+\\.\\d+")) {
+            return Double.parseDouble(expr);
+        }
+
+        // 5. 其它情况：认为是 SQL 表达式，原样返回
         return expr;
     }
 
     /**
-     * 替换 -- 表达式中的所有 #{...} 占位符<br><br>
-     * 将 where/表达式中的所有 #{...} 占位符替换成 SQL 字面量（字符串会加单引号）<br>
-     * 例如 "status = #{0} AND name LIKE #{1}" -> "status = 1 AND name LIKE '%张%'"
+     * 填充表达式中的 #{...} 占位符，并转换为 SQL 字面量<br>
+     * 该方法会：<br>
+     * 1.扫描文本中的所有 #{...}<br>
+     * 2.使用 {@link #parseValueExpression(String, Object[])} 解析值<br>
+     * 3.自动转换为 SQL 字面量（字符串加单引号）<br>
+     * 示例：<br>
+     * <pre>
+     * 输入:  "status = #{0} AND name LIKE #{1}"
+     * 参数:  [1, "%张%"]
+     * 输出:  "status = 1 AND name LIKE '%张%'"
+     * </pre>
+     * @param text 含占位符的表达式文本
+     * @param args 方法参数数组
+     * @return 已填充完成的 SQL 表达式
      */
     public static String fillExpression(String text, Object[] args) {
-        if (text == null || text.isEmpty()) return text;
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
 
-        StringBuilder out = new StringBuilder();
-        int idx = 0;
+        StringBuilder result = new StringBuilder();
+        int index = 0;
 
-        while (idx < text.length()) {
-            int start = text.indexOf("#{", idx);
+        while (index < text.length()) {
+            int start = text.indexOf("#{", index);
             if (start == -1) {
-                out.append(text.substring(idx));
+                // 没有占位符，直接追加剩余内容
+                result.append(text.substring(index));
                 break;
             }
 
-            out.append(text, idx, start);
+            // 追加 #{ 之前的内容
+            result.append(text, index, start);
+
             int end = text.indexOf('}', start + 2);
             if (end == -1) {
-                // 没有闭合的 #{，直接追加剩余并退出
-                out.append(text.substring(start));
+                // 未闭合的占位符，直接追加并终止
+                result.append(text.substring(start));
                 break;
             }
 
-            String expr = text.substring(start, end + 1); // 包括 #{}
-            Object val = parse(expr, args);
+            // 提取完整 #{...}
+            String expr = text.substring(start, end + 1);
+            Object value = parseValueExpression(expr, args);
 
             // 转换为 SQL 字面量
-            out.append(toSqlLiteral(val));
-            idx = end + 1;
+            result.append(toSqlLiteral(value));
+
+            index = end + 1;
         }
-        return out.toString();
+
+        return result.toString();
     }
 
-    /**
-     * 私有方法 -- 读取对象字段值（支持私有字段和父类字段）
-     */
-    private static Object readFieldValue(Object obj, String fieldName) {
-        if (obj == null) return null;
-        try {
-            Field f = obj.getClass().getDeclaredField(fieldName);
-            f.setAccessible(true);
-            return f.get(obj);
-        } catch (NoSuchFieldException nsf) {
-            // 尝试父类字段
-            Class<?> cls = obj.getClass();
-            while (cls.getSuperclass() != null) {
-                cls = cls.getSuperclass();
-                try {
-                    Field f = cls.getDeclaredField(fieldName);
-                    f.setAccessible(true);
-                    return f.get(obj);
-                } catch (Exception e) {
-                    /* 继续查找 */
-                }
-            }
-            return null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
+
 
     /**
-     * 私有方法 -- 将 Java 值转换为 SQL 字面量<br><br>
-     * 例如：<br>
-     * 1.null -> "NULL"<br>
-     * 2.String -> 带单引号，并转义单引号<br>
-     * 3.其它类型 -> 调用 toString()
+     * 将 Java 值转换为 SQL 字面量<br>
+     * 转换规则：<br>
+     * - null → NULL<br>
+     * - String → 单引号包裹，并转义内部单引号<br>
+     * - 其它类型 → 调用 toString()<br>
+     * @param value Java 值
+     * @return SQL 可直接使用的字面量
      */
-    private static String toSqlLiteral(Object val) {
-        if (val == null) return "NULL";
-        if (val instanceof String) {
-            String s = (String) val;
+    private static String toSqlLiteral(Object value) {
+        if (value == null) return "NULL";
+
+        if (value instanceof String) {
+            String s = (String) value;
             // 简单地对单引号转义
             s = s.replace("'", "''");
             return "'" + s + "'";
         }
+
         // 其它类型直接调用 toString（数字/布尔等）
-        return String.valueOf(val);
+        return String.valueOf(value);
     }
+
 }

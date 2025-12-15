@@ -13,6 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @LastModified 2025/11/25
  * @VersionHistory [版本历史]
  */
+// 现在由于体系的升级原先通过反射-构建-获取注解的方式已经不适用了
+// 但是不得不考虑如果不使用Spring AOP的情况下的备选方案
+// 不过在现在设计的初级阶段暂时不考虑此问题，大改替换了原先的很多逻辑和方法但是都有备份
+@Deprecated
 public class AnnotationCacheUtil {
 
     /**

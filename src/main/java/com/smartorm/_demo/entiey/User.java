@@ -8,11 +8,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.Date;
 
 /**
- * @author <a href="#">Forgotten.</a>
- * @Details 案例实体类 -- 注意需要使用 Mybatis-Plus注解
+ * @author <a href="wangheran55@gmail.com">Forgotten.</a>
+ * @Details 案例实体类 -- 注意必要时需要使用 Mybatis-Plus注解
  * @CreateDate 2025/11/25
  * @LastModified 2025/11/25
- * @VersionHistory [版本历史]
  */
 @TableName("user")
 public class User {
@@ -23,11 +22,13 @@ public class User {
     @TableField("user_name")
     private String userName;
 
+//    @TableField("age")
     private Integer age;
 
     @TableField("create_time")
     private Date createTime;
 
+//    @TableField("status")
     private Integer status;
 
     public Long getId() {
