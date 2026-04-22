@@ -1,0 +1,48 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# VS Code
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test / reports
+surefire-reports/
+failsafe-reports/
+*.dump
+*.dumpstream
+
+# Local env / secrets
+.env
+.env.*
+application-local.yml
+application-local.yaml
+application-dev.yml
+application-dev.yaml
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Python / misc
+__pycache__/
+*.pyc

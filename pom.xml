@@ -1,81 +1,112 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.smartorm</groupId>
-    <artifactId>SmartOrm</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <name>SmartOrm</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.5</version>
+        <relativePath/>
     </parent>
 
+    <groupId>io.github.forgottenlab</groupId>
+    <artifactId>smartorm</artifactId>
+    <version>2.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>SmartORM</name>
+    <description>An annotation-driven enhancement toolkit for MyBatis-Plus / 基于注解驱动的 MyBatis-Plus 增强工具</description>
+    <url>https://github.com/forgottenlab/smartorm</url>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>forgottenlab</id>
+            <name>ForgottenLab</name>
+            <email>wangheran55@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/forgottenlab/smartorm.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/forgottenlab/smartorm.git</developerConnection>
+        <url>https://github.com/forgottenlab/smartorm</url>
+        <tag>v2.0.0</tag>
+    </scm>
 
     <properties>
         <java.version>17</java.version>
-        <project.mybatis-plus.version>3.5.14</project.mybatis-plus.version>
-        <project.spring-boot.version>3.5.5</project.spring-boot.version>
-        <project.mysql-connector.version>9.4.0</project.mysql-connector.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mybatis-plus.version>3.5.14</mybatis-plus.version>
+        <mybatis-plus-join.version>1.5.5</mybatis-plus-join.version>
+        <mysql.version>9.4.0</mysql.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
     </properties>
 
     <dependencies>
-        <!-- mybatis-plus -->
+        <!-- MyBatis-Plus -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-            <version>${project.mybatis-plus.version}</version>
+            <version>${mybatis-plus.version}</version>
         </dependency>
 
-        <!-- mybatis-plus 分页插件 -->
+        <!-- MyBatis-Plus JSqlParser support -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <version>${project.mybatis-plus.version}</version>
+            <version>${mybatis-plus.version}</version>
         </dependency>
 
-        <!-- Spring Boot Starter（包含所有Spring核心） -->
+        <!-- MyBatis-Plus-Join -->
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-boot-starter</artifactId>
+            <version>${mybatis-plus-join.version}</version>
+        </dependency>
+
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>${project.spring-boot.version}</version>
         </dependency>
 
-        <!-- Spring AOP -->
+        <!-- AOP runtime support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <version>${project.spring-boot.version}</version>
-            <!-- 确保依赖不会被传递，TODO：后续最好能做到其中的所有依赖都不被传递 -->
-            <scope>provided</scope>
         </dependency>
 
-        <!-- Spring Boot Web (用于测试) -->
+        <!-- Demo / local run support -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${project.spring-boot.version}</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
-            <version>${project.mysql-connector.version}</version>
+            <version>${mysql.version}</version>
         </dependency>
 
-        <!-- 测试 -->
+        <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${project.spring-boot.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -83,8 +114,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${project.spring-boot.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${java.version}</release>
+                </configuration>
             </plugin>
         </plugins>
     </build>
+
 </project>
