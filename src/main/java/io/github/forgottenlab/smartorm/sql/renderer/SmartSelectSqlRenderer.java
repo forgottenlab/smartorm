@@ -33,7 +33,7 @@ public final class SmartSelectSqlRenderer extends SmartBaseSqlRenderer {
         renderFrom(sql, meta.getEntityClass());
 
         // JOIN
-        renderJoins(sql, meta, params);
+        renderJoins(sql, meta, args, params);
 
         // WHERE
         renderWhere(sql, meta.getWhere(), args, params);

@@ -1,5 +1,7 @@
 package io.github.forgottenlab.smartorm.util;
 
+import io.github.forgottenlab.smartorm.exception.SmartOrmException;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,9 +121,21 @@ public final class SmartExpressionUtil {
 
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
-            int index = Integer.parseInt(matcher.group(1));
-            params.add(args[index]);
-            matcher.appendReplacement(sb, "#\\{params[" + index + "]}");
+            int methodArgIndex = Integer.parseInt(matcher.group(1));
+            if (args == null || methodArgIndex >= args.length) {
+                int argumentCount = args == null ? 0 : args.length;
+                throw new SmartOrmException(
+                        "SQL 参数索引越界: #{" + methodArgIndex + "}, 可用参数数量: " + argumentCount
+                );
+            }
+
+            // 方法参数索引不等于紧凑列表位置；占位符必须指向本次追加的位置。
+            int compactParamIndex = params.size();
+            params.add(args[methodArgIndex]);
+            matcher.appendReplacement(
+                    sb,
+                    Matcher.quoteReplacement("#{params[" + compactParamIndex + "]}")
+            );
         }
         matcher.appendTail(sb);
 

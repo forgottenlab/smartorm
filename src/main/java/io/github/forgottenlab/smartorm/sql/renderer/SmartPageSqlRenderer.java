@@ -32,7 +32,7 @@ public final class SmartPageSqlRenderer {
         SmartBaseSqlRenderer.renderFrom(baseSql, meta.getEntityClass());
 
         // JOIN
-        SmartBaseSqlRenderer.renderJoins(baseSql, meta, params);
+        SmartBaseSqlRenderer.renderJoins(baseSql, meta, args, params);
 
         // WHERE
         SmartBaseSqlRenderer.renderWhere(baseSql, meta.where, args, params);

@@ -49,6 +49,7 @@ public abstract class SmartBaseSqlRenderer {
     protected static void renderJoins(
             StringBuilder sql,
             QuerySemantic meta,
+            Object[] args,
             List<Object> params
     ) {
         List<JoinMeta> joins = meta.getJoins();
@@ -70,14 +71,9 @@ public abstract class SmartBaseSqlRenderer {
                 sql.append(" ").append(join.alias);
             }
 
-            if (join.userDefinedOn) {
-                sql.append(" ON #{params[")
-                        .append(params.size())
-                        .append("]}");
-                params.add(join.on);
-            } else {
-                sql.append(" ON ").append(join.on);
-            }
+            // ON 是已由注解/元数据定义并校验的 SQL 结构，只有其中的 #{n} 是绑定值。
+            String parsedOn = SmartExpressionUtil.parseSqlWithParams(join.on, args, params);
+            sql.append(" ON ").append(parsedOn);
         }
     }
 
