@@ -281,6 +281,16 @@ int updateUserNameAndAge(String userName, Integer age, Long id);
 int deleteInactiveYoungUsers(Integer status, Integer maxAge);
 ```
 
+`@SmartUpdate` 和 `@SmartDelete` 默认拒绝最终未生成有效 WHERE 谓词的操作，避免意外全表更新或删除。
+如果业务确实要求全表操作，必须在目标方法上显式声明 `allowFullTable = true`：
+
+```java
+@SmartDelete(allowFullTable = true)
+int deleteAllUsers();
+```
+
+该 opt-in 只放行空 WHERE 安全检查，不改变其他 SQL 解析或校验语义。升级后，原先依赖无条件全表操作的调用需要显式迁移。
+
 #### 分页
 
 ```java

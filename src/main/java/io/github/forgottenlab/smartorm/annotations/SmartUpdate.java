@@ -23,4 +23,7 @@ public @interface SmartUpdate {
     /** 更新条件 */
     String where() default "";
 
+    /** 是否显式允许无有效 WHERE 条件的全表更新 */
+    boolean allowFullTable() default false;
+
 }

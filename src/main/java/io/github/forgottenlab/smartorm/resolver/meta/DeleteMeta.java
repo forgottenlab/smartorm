@@ -11,4 +11,7 @@ public class DeleteMeta extends BaseMeta {
 
     /** 删除条件 */
     public String where;
+
+    /** 是否显式允许无有效 WHERE 条件的全表删除 */
+    public boolean allowFullTable;
 }

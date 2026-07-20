@@ -91,6 +91,7 @@ public class SmartWrapperBuilder {
             wrapper.apply(SmartExpressionUtil.fillExpression(meta.where, args));
         }
 
+        SmartMutationSafetyGuard.verifyUpdate(meta, wrapper);
         return wrapper;
     }
 
@@ -101,6 +102,8 @@ public class SmartWrapperBuilder {
             DeleteMeta meta,
             Object[] args
     ) {
-        return SmartWrapperCommonBuilder.buildBaseWrapper(meta, args);
+        QueryWrapper<T> wrapper = SmartWrapperCommonBuilder.buildBaseWrapper(meta, args);
+        SmartMutationSafetyGuard.verifyDelete(meta, wrapper);
+        return wrapper;
     }
 }

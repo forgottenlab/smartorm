@@ -24,6 +24,7 @@ public class SmartUpdateResolver extends SmartBaseResolver {
         meta.fields = ann.fields();
         meta.values = ann.values();
         meta.where = ann.where();
+        meta.allowFullTable = ann.allowFullTable();
 
         return meta;
     }

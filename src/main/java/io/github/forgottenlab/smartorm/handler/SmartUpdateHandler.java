@@ -44,6 +44,8 @@ public class SmartUpdateHandler implements SmartHandler<SmartUpdate> {
             // 3. 执行 Mapper 方法
             return SmartMapperExecutor.update(ctx.getMapper(), wrapper);
 
+        } catch (SmartOrmException e) {
+            throw e;
         } catch (Exception e) {
             throw new SmartOrmException("处理 @SmartUpdate 发生异常", e);
         }

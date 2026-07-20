@@ -17,4 +17,7 @@ public class UpdateMeta extends BaseMeta {
 
     /** 更新条件 */
     public String where;
+
+    /** 是否显式允许无有效 WHERE 条件的全表更新 */
+    public boolean allowFullTable;
 }

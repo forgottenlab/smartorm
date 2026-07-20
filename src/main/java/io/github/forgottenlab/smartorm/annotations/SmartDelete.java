@@ -17,4 +17,7 @@ public @interface SmartDelete {
     /** 删除条件 */
     String where() default "";
 
+    /** 是否显式允许无有效 WHERE 条件的全表删除 */
+    boolean allowFullTable() default false;
+
 }

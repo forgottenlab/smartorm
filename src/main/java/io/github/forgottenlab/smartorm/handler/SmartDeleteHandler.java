@@ -44,6 +44,8 @@ public class SmartDeleteHandler implements SmartHandler<SmartDelete> {
             // 3. 执行 Mapper 方法
             return SmartMapperExecutor.delete(ctx.getMapper(), wrapper);
 
+        } catch (SmartOrmException e) {
+            throw e;
         } catch (Exception e) {
             throw new SmartOrmException("处理 @SmartDelete 发生异常", e);
         }

@@ -21,6 +21,7 @@ public class SmartDeleteResolver extends SmartBaseResolver {
         DeleteMeta meta = new DeleteMeta();
         fillCommonMeta(meta, method, mapperInterface);
         meta.where = ann.where();
+        meta.allowFullTable = ann.allowFullTable();
         return meta;
     }
 }

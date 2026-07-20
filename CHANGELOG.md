@@ -2,6 +2,14 @@
 
 本文件用于统一记录 SmartORM / MyBatis-Plus-Helper 的版本变更历史。
 
+## [Unreleased]
+
+### Added
+- `SmartUpdate.allowFullTable` 与 `SmartDelete.allowFullTable`，默认值均为 `false`，用于显式声明有意执行全表写操作。
+
+### Changed
+- `SmartUpdate` / `SmartDelete` 现在基于最终结构化 WHERE 谓词默认拒绝无条件全表操作；此前依赖空 WHERE 的调用需要显式设置 `allowFullTable = true`。
+
 ## [2.0.0] - 2026-04-22
 
 ### Added
