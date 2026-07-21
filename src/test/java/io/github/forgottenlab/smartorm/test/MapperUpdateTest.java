@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional // 每个测试结束自动回滚
 class MapperUpdateTest {
 
@@ -52,7 +54,9 @@ class MapperUpdateTest {
 
         // 准备数据
         userMapper.insertUser("旧名字", 25, 1);
-        User before = userMapper.findUsersByName("旧名字").get(0);
+        List<User> matches = userMapper.findUsersByName("旧名字");
+        assertEquals(1, matches.size());
+        User before = matches.get(0);
 
         // 执行更新
         int rows = userMapper.updateUserNameAndAge(
@@ -81,7 +85,9 @@ class MapperUpdateTest {
     void test_updateUserStatus() {
 
         userMapper.insertUser("状态测试用户", 22, 1);
-        User user = userMapper.findUsersByName("状态测试用户").get(0);
+        List<User> matches = userMapper.findUsersByName("状态测试用户");
+        assertEquals(1, matches.size());
+        User user = matches.get(0);
 
         int rows = userMapper.updateUserStatus(0, user.getId());
         assertEquals(1, rows);
@@ -101,7 +107,9 @@ class MapperUpdateTest {
     void test_incrementAge() {
 
         userMapper.insertUser("年龄递增用户", 25, 1);
-        User before = userMapper.findUsersByName("年龄递增用户").get(0);
+        List<User> matches = userMapper.findUsersByName("年龄递增用户");
+        assertEquals(1, matches.size());
+        User before = matches.get(0);
 
         int rows = userMapper.incrementAge(5, before.getId());
         assertEquals(1, rows);
@@ -126,11 +134,11 @@ class MapperUpdateTest {
 
         int rows = userMapper.updateStatusForOldUsers(0, 40);
 
-        // 至少应更新 2 条
-        assertTrue(rows >= 2);
+        assertEquals(2, rows);
 
         // 校验结果
         List<User> users = userMapper.findUsersByName("OldUser");
+        assertEquals(2, users.size());
         for (User user : users) {
             assertEquals(0, user.getStatus());
         }

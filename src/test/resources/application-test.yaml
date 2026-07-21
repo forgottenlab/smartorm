@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: "jdbc:mysql://${SMARTORM_TEST_DB_HOST:127.0.0.1}:${SMARTORM_TEST_DB_PORT:13316}/smartorm_demo?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai"
+    username: ${SMARTORM_TEST_DB_USERNAME}
+    password: ${SMARTORM_TEST_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 5000
+      validation-timeout: 3000
+  sql:
+    init:
+      mode: never
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: io.github.forgottenlab.smartorm.demo.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+logging:
+  level:
+    io.github.forgottenlab.smartorm: warn
+    org.mybatis: warn

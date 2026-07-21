@@ -6,6 +6,7 @@ import io.github.forgottenlab.smartorm.demo.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional // 每个测试结束自动回滚
 public class SmartMapperCoreTest {
 
@@ -107,12 +109,13 @@ public class SmartMapperCoreTest {
         userMapper.insertUser("Dup", 20, 1);
         userMapper.insertUser("Dup", 21, 1);
 
-        assertThrows(
+        RuntimeException exception = assertThrows(
                 RuntimeException.class,
                 () -> userMapper.findOne(
                         new QueryWrapper<User>().eq("user_name", "Dup")
                 )
         );
+        assertEquals("结果超过 1 条", exception.getMessage());
     }
 
 }

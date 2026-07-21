@@ -6,6 +6,7 @@ import io.github.forgottenlab.smartorm.demo.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional
 class MapperSelectResultTypeTest {
 
@@ -37,7 +39,7 @@ class MapperSelectResultTypeTest {
 
         List<User> users = userMapper.findAllUsersAsEntity();
 
-        assertFalse(users.isEmpty());
+        assertEquals(1, users.size());
         assertInstanceOf(User.class, users.get(0));
     }
 
@@ -52,7 +54,7 @@ class MapperSelectResultTypeTest {
         List<Map<String, Object>> maps =
                 userMapper.findAllUsersAsMap();
 
-        assertFalse(maps.isEmpty());
+        assertEquals(1, maps.size());
         assertTrue(maps.get(0).containsKey("user_name"));
     }
 
@@ -68,11 +70,7 @@ class MapperSelectResultTypeTest {
         List<UserSimpleDTO> dtos =
                 userMapper.findAllUsersAsDTO();
 
-        for( UserSimpleDTO dto : dtos ) {
-            System.out.println(dto.toString());
-        }
-
-        assertFalse(dtos.isEmpty());
+        assertEquals(1, dtos.size());
         assertNotNull(dtos.get(0).getUserName());
     }
 }

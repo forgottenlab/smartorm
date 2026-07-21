@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional // 每个测试结束自动回滚
 class MapperPageTest {
 
@@ -87,15 +89,12 @@ class MapperPageTest {
         PageResult<User> pageResult =
                 userMapper.findUsersByStatusPage(1);
 
-        for (User user : pageResult.getRows()) {
-            System.out.println(user.toString());
-        }
-
         assertNotNull(pageResult);
         assertNotNull(pageResult.getRows());
-
-        // 每页最多 20 条
-        assertTrue(pageResult.getRows().size() <= 20);
+        assertEquals(1, pageResult.getPage());
+        assertEquals(20, pageResult.getPageSize());
+        assertEquals(30, pageResult.getTotal());
+        assertEquals(20, pageResult.getRows().size());
 
         for (User user : pageResult.getRows()) {
             assertEquals(1, user.getStatus());
@@ -118,8 +117,8 @@ class MapperPageTest {
 
         assertNotNull(pageResult);
         assertFalse(pageResult.getRows().isEmpty());
-
-        assertTrue(pageResult.getRows().size() <= 15);
+        assertEquals(20, pageResult.getTotal());
+        assertEquals(15, pageResult.getRows().size());
 
         int lastAge = 0;
         for (User user : pageResult.getRows()) {
@@ -147,8 +146,10 @@ class MapperPageTest {
 
         assertNotNull(pageResult);
         assertFalse(pageResult.getRows().isEmpty());
-
-        assertTrue(pageResult.getRows().size() <= 10);
+        assertEquals(2, pageResult.getPage());
+        assertEquals(5, pageResult.getPageSize());
+        assertEquals(30, pageResult.getTotal());
+        assertEquals(5, pageResult.getRows().size());
 
         for (User user : pageResult.getRows()) {
             assertTrue(user.getUserName().contains("ActiveUser"));
@@ -164,11 +165,10 @@ class MapperPageTest {
         assertNotNull(pageResult);
         assertNotNull(pageResult.getRows());
 
-        // pageSize = 5
-        assertTrue(pageResult.getRows().size() <= 5);
-
-        // total 表示满足主表条件的数据量
-        assertTrue(pageResult.getTotal() >= 1);
+        assertEquals(2, pageResult.getPage());
+        assertEquals(5, pageResult.getPageSize());
+        assertEquals(30, pageResult.getTotal());
+        assertEquals(5, pageResult.getRows().size());
 
         for (Map<String, Object> row : pageResult.getRows()) {
 

@@ -10,6 +10,7 @@ import io.github.forgottenlab.smartorm.demo.mapper.UserRoleMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional // 所有测试完成后自动回滚
 class MapperJoinTest {
 
@@ -86,8 +88,8 @@ class MapperJoinTest {
     private void prepareUserRoleData() {
         // 假设 prepareJoinData() 已经执行
 
-        // 查询刚插入的用户
-        List<User> users = userMapper.selectList(null);
+        List<User> users = userMapper.findUsersByName("join_user_");
+        assertEquals(3, users.size());
 
         for (User user : users) {
             // 所有用户都有一个 BASIC 角色
@@ -98,8 +100,9 @@ class MapperJoinTest {
             userRoleMapper.insert(role);
         }
 
-        // 给第一个用户再加一个 ADMIN 角色
-        User first = users.get(0);
+        List<User> adminCandidates = userMapper.findUsersByName("join_user_1");
+        assertEquals(1, adminCandidates.size());
+        User first = adminCandidates.get(0);
         UserRole admin = new UserRole();
         admin.setUserId(first.getId());
         admin.setRoleCode("ADMIN");
@@ -196,11 +199,11 @@ class MapperJoinTest {
                 userMapper.selectUserProfileDTO();
 
         assertNotNull(list);
-        assertFalse(list.isEmpty());
-
-        UserProfileDTO dto = list.get(0);
-        assertNotNull(dto.getId());
-        assertNotNull(dto.getUserName());
+        assertEquals(3, list.size());
+        list.forEach(dto -> {
+            assertNotNull(dto.getId());
+            assertNotNull(dto.getUserName());
+        });
         // LEFT JOIN 场景下 email 允许为 null
     }
 
@@ -293,7 +296,7 @@ class MapperJoinTest {
                 userMapper.selectUserWithProfileAndRole();
 
         assertNotNull(result);
-        assertFalse(result.isEmpty());
+        assertEquals(4, result.size());
 
         // 至少有一条 ADMIN
         boolean hasAdmin = result.stream()
@@ -310,8 +313,7 @@ class MapperJoinTest {
         List<Map<String, Object>> result =
                 userMapper.selectUserWithProfileAndRoleInner();
 
-        // 所有用户都有 profile + role
-        assertFalse(result.isEmpty());
+        assertEquals(3, result.size());
 
         result.forEach(r -> {
             assertNotNull(r.get("email"));

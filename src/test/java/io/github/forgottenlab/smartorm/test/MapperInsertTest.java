@@ -5,6 +5,7 @@ import io.github.forgottenlab.smartorm.demo.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional // 每个测试结束自动回滚
 class MapperInsertTest {
 
@@ -43,7 +45,7 @@ class MapperInsertTest {
         assertEquals(1, rows);
 
         List<User> users = userMapper.findUsersByName("InsertUser");
-        assertFalse(users.isEmpty());
+        assertEquals(1, users.size());
 
         User user = users.get(0);
         assertEquals("InsertUser", user.getUserName());
@@ -63,7 +65,9 @@ class MapperInsertTest {
         int rows = userMapper.insertSimpleUser("SimpleUser", 22);
         assertEquals(1, rows);
 
-        User user = userMapper.findUsersByName("SimpleUser").get(0);
+        List<User> users = userMapper.findUsersByName("SimpleUser");
+        assertEquals(1, users.size());
+        User user = users.get(0);
 
         assertEquals("SimpleUser", user.getUserName());
         assertEquals(22, user.getAge());
@@ -85,8 +89,9 @@ class MapperInsertTest {
                 userMapper.insertUserWithDefaultStatus("ConstStatusUser", 30);
         assertEquals(1, rows);
 
-        User user =
-                userMapper.findUsersByName("ConstStatusUser").get(0);
+        List<User> users = userMapper.findUsersByName("ConstStatusUser");
+        assertEquals(1, users.size());
+        User user = users.get(0);
 
         assertEquals("ConstStatusUser", user.getUserName());
         assertEquals(30, user.getAge());

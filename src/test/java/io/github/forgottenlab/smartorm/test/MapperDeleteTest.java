@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional // 每个测试结束自动回滚
 class MapperDeleteTest {
 
@@ -52,7 +54,9 @@ class MapperDeleteTest {
     void test_deleteUserById() {
 
         userMapper.insertUser("ToDelete", 28, 1);
-        User user = userMapper.findUsersByName("ToDelete").get(0);
+        List<User> matches = userMapper.findUsersByName("ToDelete");
+        assertEquals(1, matches.size());
+        User user = matches.get(0);
 
         int rows = userMapper.deleteUserById(user.getId());
         assertEquals(1, rows);

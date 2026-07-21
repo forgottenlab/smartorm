@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:9.4.0
+    restart: "no"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SMARTORM_TEST_ROOT_PASSWORD:?SMARTORM_TEST_ROOT_PASSWORD must be set}
+      MYSQL_DATABASE: smartorm_demo
+      MYSQL_USER: ${SMARTORM_TEST_DB_USERNAME:?SMARTORM_TEST_DB_USERNAME must be set}
+      MYSQL_PASSWORD: ${SMARTORM_TEST_DB_PASSWORD:?SMARTORM_TEST_DB_PASSWORD must be set}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+08:00
+      - --sql-mode=STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION
+    ports:
+      - "127.0.0.1:${SMARTORM_TEST_DB_PORT:-13316}:3306"
+    volumes:
+      - mysql-test-data:/var/lib/mysql
+      - ./src/main/resources/demo/sql/init-smartorm-demo.sql:/docker-entrypoint-initdb.d/001-smartorm-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+volumes:
+  mysql-test-data:

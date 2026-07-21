@@ -1,10 +1,12 @@
 package io.github.forgottenlab.smartorm.test;
 
 import io.github.forgottenlab.smartorm.demo.mapper.hook.HookTestUserMapper;
+import io.github.forgottenlab.smartorm.exception.SmartOrmException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional
 class SmartMapperHookTest {
 
@@ -49,8 +52,6 @@ class SmartMapperHookTest {
                 HookTestUserMapper.INVOCATION_LOG
         );
 
-        System.out.println(HookTestUserMapper.INVOCATION_LOG);
-
     }
 
     /**
@@ -60,16 +61,18 @@ class SmartMapperHookTest {
     @Test
     void test_hook_on_exception() {
 
-        assertThrows(Exception.class, () ->
+        SmartOrmException exception = assertThrows(SmartOrmException.class, () ->
                 userMapper.selectWillFail("x")
         );
 
-        assertTrue(
-                HookTestUserMapper.INVOCATION_LOG.stream()
-                        .anyMatch(s -> s.startsWith("exception:selectWillFail"))
+        assertEquals("处理 @SmartSelect 失败", exception.getMessage());
+        assertEquals(
+                List.of(
+                        "before:selectWillFail",
+                        "exception:selectWillFail"
+                ),
+                HookTestUserMapper.INVOCATION_LOG
         );
-
-        System.out.println(HookTestUserMapper.INVOCATION_LOG);
     }
 
 }

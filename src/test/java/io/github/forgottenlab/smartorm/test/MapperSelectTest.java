@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 @SpringBootTest(classes = io.github.forgottenlab.smartorm.demo.SmartOrmDemoApplication.class)
+@ActiveProfiles("test")
 @Transactional // 每个测试结束自动回滚
 class MapperSelectTest {
 
@@ -52,7 +54,7 @@ class MapperSelectTest {
         List<User> users = userMapper.findActiveUsersByAge(22, 1);
 
         assertNotNull(users);
-        assertFalse(users.isEmpty());
+        assertEquals(2, users.size());
 
         for (User user : users) {
             assertTrue(user.getAge() > 22);
@@ -86,7 +88,7 @@ class MapperSelectTest {
         List<User> users = userMapper.findUsersByName("a");
 
         assertNotNull(users);
-        assertFalse(users.isEmpty());
+        assertEquals(3, users.size());
 
         for (User user : users) {
             assertTrue(
@@ -105,7 +107,9 @@ class MapperSelectTest {
 
         userMapper.insertUser("Target", 28, 1);
 
-        User inserted = userMapper.findUsersByName("Target").get(0);
+        List<User> matches = userMapper.findUsersByName("Target");
+        assertEquals(1, matches.size());
+        User inserted = matches.get(0);
 
         User result = userMapper.findUserById(inserted.getId());
 
@@ -125,7 +129,7 @@ class MapperSelectTest {
                 userMapper.findComplexUsers(20, 1, "a");
 
         assertNotNull(users);
-        assertFalse(users.isEmpty());
+        assertEquals(1, users.size());
 
         for (User user : users) {
             assertTrue(user.getAge() > 20);
@@ -147,6 +151,7 @@ class MapperSelectTest {
         List<User> users = userMapper.findRecentActiveUsers(1);
 
         assertNotNull(users);
+        assertEquals(3, users.size());
 
         for (User user : users) {
             assertEquals(1, user.getStatus());

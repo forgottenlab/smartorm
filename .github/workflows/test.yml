@@ -1,0 +1,66 @@
+name: Test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SMARTORM_TEST_ROOT_PASSWORD: smartorm-ci-root-only
+      SMARTORM_TEST_DB_USERNAME: smartorm_ci
+      SMARTORM_TEST_DB_PASSWORD: smartorm-ci-test-only
+      SMARTORM_TEST_DB_PORT: "13316"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Compile tests
+        run: mvn -B test-compile
+
+      - name: Run database-free tests
+        run: >-
+          mvn -B
+          -Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest
+          test
+
+      - name: Validate MySQL Compose configuration
+        run: docker compose -p smartorm-ci -f docker-compose.test.yml config --quiet
+
+      - name: Start disposable MySQL
+        run: docker compose -p smartorm-ci -f docker-compose.test.yml up -d --wait
+
+      - name: Run database tests
+        run: >-
+          mvn -B
+          -Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest
+          test
+
+      - name: Package without rerunning tests
+        run: mvn -B -DskipTests package
+
+      - name: Upload Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          if-no-files-found: warn
+
+      - name: Remove disposable MySQL state
+        if: always()
+        run: docker compose -p smartorm-ci -f docker-compose.test.yml down -v --remove-orphans
