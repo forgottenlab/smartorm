@@ -6,9 +6,18 @@
 
 ### Added
 - `SmartUpdate.allowFullTable` 与 `SmartDelete.allowFullTable`，默认值均为 `false`，用于显式声明有意执行全表写操作。
+- 固定 `mysql:9.4.0`、可清理且仅绑定 loopback 的 Docker Compose 测试环境，以及隔离主数据源的 Spring `test` profile。
+- Java 17 / MySQL 集成测试 GitHub Actions 工作流设计与 Surefire 报告归档步骤；该工作流尚未远程运行验证。
+- 英文默认 `README.md`、中文 `README.zh-CN.md`，以及双语 Getting Started、Migration、Safety、Testing、Architecture、Compatibility、Roadmap 和 Release Checklist。
 
 ### Changed
 - `SmartUpdate` / `SmartDelete` 现在基于最终结构化 WHERE 谓词默认拒绝无条件全表操作；此前依赖空 WHERE 的调用需要显式设置 `allowFullTable = true`。
+- 公开文档明确将 SmartORM 定位为 Spring Boot 与 MyBatis-Plus 的按需增强，而不是 MyBatis、MyBatis-Plus、Wrapper、XML、Provider 或 MPJ 的替代品。
+- 数据库测试改为显式激活隔离 `test` profile，并强化确定性 fixture、行数、分页、异常和 JOIN 断言。
+
+### Fixed
+- 修复 Native SQL 使用原方法参数索引访问紧凑绑定列表导致的乱序/稀疏参数错误。
+- 修复显式 JOIN `ON` 被整体当作标量参数的问题；结构保留为受控 SQL 谓词，其中运行时标量继续绑定。
 
 ## [2.0.0] - 2026-04-22
 
