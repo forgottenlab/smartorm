@@ -2,11 +2,16 @@
 
 [English](architecture.md) · [简体中文](architecture.zh-CN.md)
 
-> **摘要：** SmartORM 2.0.x 采用单模块、分层运行链路。本文严格区分当前实现和未来架构；规划中的模块与 Starter 类型当前均不可用。
+> **摘要：** SmartORM 在兼容的 `smartorm` artifact 中保留已验证的 2.0.x 分层运行链路。2.1.x 开发线增加 Maven reactor 与最小合并式 Spring Boot Starter，但没有提前执行规划中的 3.0 语义拆分。
 
 ## 🧭 当前范围
 
-SmartORM 仍是一个 Maven 单模块，源码树同时包含库代码、Spring 集成、demo 应用/配置、MPJ 集成、MySQL 支持/资源和测试。2.0.x release build 会生成普通库主 JAR，以及 sources 与 Javadoc JAR。Demo class、`application.yaml` 和 demo SQL 已从发布 artifacts 排除，但仍保留在仓库源码树中。当前不存在 AutoConfiguration 或物理子模块。
+根项目现在是 `io.github.forgottenlab:smartorm-parent:2.1.0-SNAPSHOT` 聚合器，包含两个子模块：
+
+- `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`：兼容的合并式库，Java package 与公开 API 未改变；
+- `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`：合并式 Starter 与自动配置 artifact。
+
+库代码、Spring 集成、MPJ、MySQL 支持、测试和 demo 源码仍共存于 `smartorm` 子模块；这不是未来 core/Spring/JOIN 语义拆分。Core 构建继续生成普通主 JAR、sources 与 Javadoc JAR。Demo class、`application.yaml` 和 demo SQL 仍保留在源码中，但会从类发布 artifacts 排除。
 
 ## 🔄 运行链路
 
@@ -36,6 +41,7 @@ Annotated Mapper method
 | `mapper` | `SmartMapper` 与内部 `SmartNativeMapper` |
 | `support`, `util` | JOIN 推断、映射、元数据、表达式和辅助能力 |
 | `demo` | 内置应用、实体、Mapper 与 MyBatis 配置 |
+| Starter `autoconfigure` | `SmartOrmAutoConfiguration` 与 package-private 运行时 Bean registrar |
 
 ## 🔎 无 JOIN 查询路径
 
@@ -58,17 +64,31 @@ Insert 会把 fields/values 解析为实体并委托 MyBatis-Plus insert。Updat
 
 ## 🔧 当前接入要求
 
-Spring 组件扫描必须包含 `io.github.forgottenlab.smartorm`，Mapper 扫描必须同时包含应用 Mapper 和 `io.github.forgottenlab.smartorm.mapper`。demo 通过 `scanBasePackages` 和 `@MapperScan` 实现这一点。
+直接使用 `smartorm` core artifact 时保留原有手动路径：Spring component scan 包含 `io.github.forgottenlab.smartorm`，Mapper 扫描同时包含应用 Mapper 和 `io.github.forgottenlab.smartorm.mapper`。
 
-2.0.x 当前没有面向使用方的 Starter、配置元数据、FailureAnalyzer、启动校验器或 Doctor。
+2.1.x 开发版 Starter 使用以下激活链路：
+
+```text
+AutoConfiguration.imports
+  -> SmartOrmAutoConfiguration
+  -> BeanFactoryPostProcessor registrar
+  -> 恰好一个应用自有 SmartNativeMapper
+  -> SmartNativeExecutor + 五个 handler + registry + aspect
+```
+
+Starter 不扫描 SmartORM component 或 Mapper package。应用必须用已有 MyBatis 注册机制提供且只提供一个 `SmartNativeMapper`，通常是在已有 `@MapperScan` 中加入 `io.github.forgottenlab.smartorm.mapper`。Registrar 在 MyBatis registry post-processor 之后观察 BeanDefinition，避免过早的 `@ConditionalOnBean` 在 `@MapperScan` 注册 Mapper 之前错误 backoff。没有声明硬编码的自动配置 `before`/`after` 顺序。
+
+激活刻意采用保守策略。`SmartNativeMapper` 缺失或不唯一、已存在 `SmartAnnotationAspect`，或标准运行时 Bean 名称冲突时，完整 SmartORM Bean 图会 back off。Starter 不注册 Mapper 或 scanner，也不创建 `DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理器、分页拦截器或 `JdbcMetaProvider`；bootstrap 不连接数据库。
+
+配置属性/元数据、声明校验、FailureAnalyzer、启动 Validator 与 Doctor 尚未实现。
 
 ## 🧩 当前依赖与 API 边界
 
 - `SmartMapper<T>` 公开继承 `BaseMapper<T>` 与 `MPJBaseMapper<T>`。
 - 由于 `SmartMapper` 暴露 `MPJBaseMapper`，MyBatis-Plus-Join 仍保持传递依赖。
 - JSqlParser 为 optional；Spring Web 与 MySQL Connector/J 为 runtime + optional，不再是使用方必须继承的传递依赖。
-- Demo 代码与运行集成仍和核心语义位于同一源码模块，但 demo class/configuration/SQL 已从发布 artifacts 排除。
-- 本地安装 artifact 已通过外部使用方 2 个 smoke tests，包括一次离线复跑；Maven Central 消费仍未验证。
+- Demo 代码与运行集成仍和 core 语义位于 `smartorm` 子模块，但 demo class/configuration/SQL 已从发布 artifacts 排除。
+- 本地安装的 core artifact 保留既有外部使用方 2 个 smoke tests 证据。开发版 Starter 另外通过 1 个外部 Spring Boot 使用方 smoke 及离线复跑；Maven Central 消费与真实项目接入仍未验证。
 - `SmartQuery` 是公开但未启用的注解。
 - Wrapper 与 Native 路径没有完全相同的标量绑定实现。
 
@@ -76,10 +96,10 @@ Spring 组件扫描必须包含 `io.github.forgottenlab.smartorm`，Mapper 扫�
 
 ## 🗺️ 未来方向——仅规划
 
-路线图提出：
+路线图现在区分已在本地实现的 Starter foundation 与剩余产品工作：
 
-- 2.1.x：经过使用方测试的 Spring Boot Starter、AutoConfiguration、声明校验和诊断。
+- 2.1.x：远程验证 Starter foundation，为单个真实项目模块制定接入计划，再独立设计配置、校验与诊断。
 - 2.2.x：完成兼容性设计后的聚焦 API 易用性改进。
 - 3.0：物理拆分 core/Spring/JOIN/demo，并建立 `SmartMapper`/`SmartJoinMapper` 边界。
 
-本文没有实现上述模块、坐标、属性或 API。详见[路线图](roadmap.zh-CN.md)。
+后续项仍是计划，不是已交付 API、坐标、日期或实现授权。详见[路线图](roadmap.zh-CN.md)。

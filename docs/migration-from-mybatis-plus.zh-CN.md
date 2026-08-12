@@ -8,13 +8,13 @@
 
 ## 🧭 可用性总览
 
-| Level | 目标 | 当前 2.0.x 状态 |
+| Level | 目标 | 当前状态 |
 |---|---|---|
-| 0 | 添加当前源码/本地模块或本地安装 artifact，但不迁移方法 | 本地 artifact 使用方 smoke 已验证；公共仓库接入尚未验证 |
+| 0 | 添加当前源码/本地模块或本地安装 artifact，但不迁移方法 | Core 与 2.1.x 开发版 Starter 使用方 smoke 已在本地验证；公共仓库接入尚未验证 |
 | 1 | 接入一个 Mapper | 已实现 |
 | 2 | 接入一个方法 | 已实现 |
 | 3 | 选择性替换重复固定形态 SQL | 已实现，但必须有测试 |
-| 4 | 启用使用方诊断 | 规划给未来 Starter；当前不可用 |
+| 4 | 启用使用方诊断 | Validator、Doctor 与 FailureAnalyzer 仍在规划中；当前不可用 |
 | 5 | 按应用模块扩大迁移 | 流程指导；需要项目自己的回归与回滚控制 |
 
 ## 0️⃣ Level 0 — 保持现有行为
@@ -23,11 +23,13 @@
 
 - 保持 `BaseMapper`、XML、Wrapper、Provider 和现有 MPJ 代码不变。
 - 添加本地模块前后都运行原应用及测试套件。
-- 记录当前依赖面：仓库仍是单模块；发布 artifacts 排除 demo class/configuration/SQL，MPJ 保持传递，JSqlParser/Web/MySQL 按文档为 optional。
+- 记录当前依赖面：父 reactor 包含兼容 core 与合并式 Starter 子模块；core artifacts 排除 demo class/configuration/SQL，MPJ 保持传递，JSqlParser/Web/MySQL 按文档为 optional。
 
-当前限制：隔离本地仓库 install 和外部使用方 2 个 smoke tests 已通过，包括一次离线复跑，但仍没有经过验证的 Maven Central 制品或 Starter。该证据只证明本地 dependency-only 路径，不代表公共安装可用。
+当前限制：core 与开发版 Starter 都有隔离本地仓库使用方证据，包括离线复跑，但两者都没有经过验证的 Maven Central 发布。Starter feature checkpoint 也尚无远程 CI 与真实项目接入证据。这些证据只证明本地 dependency-only 路径，不代表公共安装可用。
 
-回滚：移除本地模块/依赖及对应扫描配置。
+本地 2.1.x Starter 路径使用 `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`；它消除 SmartORM component scan，但仍依赖应用已有 MyBatis 注册提供恰好一个 `SmartNativeMapper`。直接 core 路径仍为 `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`，并保留显式 component 注册。
+
+回滚：如果保留 SmartORM，移除 Starter 并恢复显式 core component 注册；或完全移除 SmartORM 依赖及扫描配置。
 
 ## 1️⃣ Level 1 — 接入一个 Mapper
 
@@ -79,16 +81,16 @@ List<User> findByStatus(Integer status);
 
 ## 4️⃣ Level 4 — 启用诊断
 
-该 Level 是未来迁移阶段，不是当前功能。规划中的 Starter 可能提供已注册 Mapper 校验、模块检查、可操作错误和脱敏诊断。
+最小 Starter 自动配置已存在于 2.1.x 开发线，但该诊断 Level 仍是未来迁移阶段。已注册 Mapper 校验、模块检查、可操作错误与脱敏诊断尚未实现。
 
 在它实现之前：
 
 - 依赖聚焦的单元/集成测试；
 - 避免在 SQL 和参数日志中输出敏感值；
-- 手动诊断组件与 Mapper 扫描；
-- 不要把 Doctor、FailureAnalyzer 或 AutoConfiguration 描述为已可用。
+- 手动诊断 Mapper 所有权与直接 core 路径中的 component 扫描；
+- 不要把 Doctor、Validator 或 FailureAnalyzer 描述为已可用。
 
-当前 2.0.x 没有可以启用或关闭的该类诊断功能。
+当前没有可以启用或关闭的该类诊断功能。
 
 ## 5️⃣ Level 5 — 按应用模块扩大迁移
 

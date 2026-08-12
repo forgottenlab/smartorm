@@ -48,9 +48,21 @@ mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererT
 
 ### ☁️ CI 验证
 
-`.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 28 个数据库无关测试，启动 Compose MySQL，运行准确的 46 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
+当前 `.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 28 个数据库无关 core 测试与 8 个 Starter 上下文测试，启动 Compose MySQL，运行准确的 46 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
 
-Foundation SHA `c13426d` 的精确 `push/main` 运行已通过只读方式核验为 run `30647688231`。它通过了 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。该结论只属于这一 SHA；新的本地 checkpoint HEAD 需在 push 后单独运行。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
+Foundation SHA `c6e8c8b` 的精确 `push/main` 运行已通过只读方式核验为 run `31574822720`。它通过了 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。该运行早于 Starter feature commits；当前 feature checkpoint 需在获得明确 push 授权后单独进行远程运行。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
+
+### 🧩 Starter 测试
+
+聚焦的自动配置套件不依赖数据库：
+
+```powershell
+mvn -o -pl smartorm-spring-boot-starter -am '-Dtest=SmartOrmAutoConfigurationTest' '-Dsurefire.failIfNoSpecifiedTests=false' test
+```
+
+当前套件 8/8 通过，覆盖 imports 发现、精确 8 Bean 运行图、应用自有 `@MapperScan`、缺类/缺 Mapper backoff、用户 Bean backoff、基础设施非所有权，以及 bootstrap 时无 Mapper 交互。
+
+一个 Boot 3.5.5 外部使用方在忽略的 `target/` 下生成，并且只解析本地安装的 `smartorm-spring-boot-starter:2.1.0-SNAPSHOT`。其单个 `@SpringBootTest` 在从项目已配置仓库获取所需 Surefire provider 后通过，随后离线复跑也通过。它使用应用自有 `@MapperScan` 与合成 `SqlSessionFactory`，没有连接数据库，也不是仓库维护的 sample project。
 
 ## ✅ 环境要求
 
@@ -102,23 +114,24 @@ docker compose -p smartorm-it-run1 -f docker-compose.test.yml down -v --remove-o
 
 ## 📦 Artifact Preflight
 
-测试编译和聚焦的 28 个测试另行通过后，本轮 preflight 以明确跳过测试的方式完成联网 clean package：
+测试编译、28 个 core 回归与 8 个 Starter 测试另行通过后，当前 reactor 以明确跳过测试的方式完成离线 package：
 
 ```powershell
-mvn -DskipTests clean package
+mvn -o -DskipTests package
 ```
 
 已生成并检查：
 
-- 普通库主 JAR，而不是 Spring Boot executable JAR；
-- sources 与 Javadoc JAR；
+- 普通 core 库主 JAR，而不是 Spring Boot executable JAR；
+- core sources 与 Javadoc JAR；
+- 包含恰好一条 `AutoConfiguration.imports` 记录的普通 Starter JAR；
 - 隔离 Maven 仓库布局中的 POM；
 - 已排除 demo class、`application.yaml` 与 demo SQL 的 artifact 内容，同时仓库仍保留 demo 源码；
 - 仓库 `LICENSE` 与打包后的许可证元数据。
 
-Package 验证使用隔离 Maven 缓存，install 则使用新建的隔离 `maven.repo.local`。独立外部使用方随后基于该 artifact 运行 2 个测试并通过，同一使用方测试也离线复跑通过。该证据只验证本地类发布 artifact 路径；Maven Central 尚未配置、上传或实际消费。
+早期 core package 验证使用隔离 Maven 缓存，外部使用方通过 2 个测试与离线复跑。当前 Starter reactor 也安装到另一个忽略的 `maven.repo.local`，其外部使用方通过 1 个测试与离线复跑。这些检查只验证本地类发布 artifact 路径；Maven Central 尚未配置、上传或实际消费。
 
-该结果不能证明位级可重复、签名、远程仓库接收或远程 CI 成功。
+该结果不能证明位级可重复、签名、远程仓库接收或 Starter feature checkpoint 的远程 CI 成功。
 
 ## 🛡️ 安全规则
 

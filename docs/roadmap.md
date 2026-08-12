@@ -21,20 +21,28 @@ Current evidence:
 - The current 2026-08-12 fresh MySQL 9.4.0 release preflight passes 46/46 and cleans container/network/volume state to 0/0/0.
 - Two independent 2026-07-20 MySQL runs and one fixed-seed randomized-order run remain historical evidence.
 - An ordinary main JAR, sources, Javadoc, standalone license, isolated install, and external consumer smoke are locally verified.
-- The exact GitHub Actions `push/main` run for Foundation SHA `c13426d` passed the 28-test, MySQL 46-test, package, report, and cleanup gates.
-- The new local checkpoint HEAD still requires push and exact-SHA remote CI verification; signing/repository setup, Maven Central publication, tag, and release remain open.
+- The exact GitHub Actions `push/main` run `31574822720` for Foundation SHA `c6e8c8b` passed the 28-test, MySQL 46-test, package, report, and cleanup gates.
+- Signing/repository setup, Maven Central publication, tag, and release remain open.
 
-## 🚀 Planned — 2.1.x Adoption Experience
+## 🚀 In Progress — 2.1.x Adoption Experience
 
-Direction, subject to a separately approved task and consumer tests:
+Locally implemented and verified in the current development line:
 
-- Spring Boot Starter;
-- AutoConfiguration integrated with MyBatis-Plus rather than competing with it;
-- focused configuration metadata;
+- a parent reactor with compatible `smartorm` core and a combined `smartorm-spring-boot-starter`;
+- `AutoConfiguration.imports` discovery without SmartORM component scanning;
+- reuse of exactly one application-owned `SmartNativeMapper`, with no Starter-owned MyBatis/database/transaction infrastructure;
+- eight database-free auto-configuration tests and an isolated external Spring Boot consumer test, including an offline repeat;
+- full core regression and disposable MySQL checks after the topology change.
+
+Still gated by separately approved work:
+
+- push and exact-SHA remote CI for the Starter feature checkpoint;
+- an isolated adoption plan, followed later by an explicitly authorized real-project migration;
+- focused configuration properties/metadata;
 - registered-Mapper declaration validation;
 - redacted diagnostics/Doctor and actionable failure analysis.
 
-No Starter coordinate, property, AutoConfiguration class, or diagnostic API is available today.
+The `2.1.0-SNAPSHOT` Starter is a locally verified development artifact, not a stable or Maven Central release. No configuration property, Validator, Doctor, or FailureAnalyzer is available today.
 
 ## 🧩 Planned — 2.2.x API Usability
 
@@ -79,7 +87,7 @@ The intended order is:
 
 1. trusted tests and public documentation;
 2. reviewable release foundation and consumer tests;
-3. Starter on the compatible artifact;
+3. minimal local Starter foundation on the compatible artifact (complete), followed by remote validation and isolated adoption planning;
 4. API usability improvements;
 5. major-version module separation.
 

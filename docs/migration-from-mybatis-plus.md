@@ -8,13 +8,13 @@ Existing `BaseMapper`, Wrapper, XML, Provider, MyBatis-Plus annotations, and MyB
 
 ## 🧭 Availability Map
 
-| Level | Goal | Current 2.0.x status |
+| Level | Goal | Current status |
 |---|---|---|
-| 0 | Add the current source/local module or locally installed artifact without method migration | Local artifact consumer smoke verified; public repository onboarding is not verified |
+| 0 | Add the current source/local module or locally installed artifact without method migration | Core and 2.1.x development Starter consumer smokes verified locally; public repository onboarding is not verified |
 | 1 | Opt in one Mapper | Implemented |
 | 2 | Opt in one method | Implemented |
 | 3 | Replace repeated fixed-shape SQL selectively | Implemented with tests required |
-| 4 | Enable consumer diagnostics | Planned for a future Starter; not available today |
+| 4 | Enable consumer diagnostics | Validator, Doctor, and FailureAnalyzer remain planned; not available today |
 | 5 | Scale by application module | Process guidance; requires your own regression and rollback controls |
 
 ## 0️⃣ Level 0 — Keep Existing Behavior
@@ -23,11 +23,13 @@ Start in a branch or local evaluation module. Do not change Mapper inheritance o
 
 - Keep `BaseMapper`, XML, Wrapper, Provider, and existing MPJ code unchanged.
 - Run the existing application and test suite before and after adding the local module.
-- Record the current dependency surface: the repository is still single-module; release artifacts exclude demo classes/configuration/SQL, MPJ remains transitive, and JSqlParser/Web/MySQL are optional as documented.
+- Record the current dependency surface: the parent reactor contains compatible core and combined Starter children; core artifacts exclude demo classes/configuration/SQL, MPJ remains transitive, and JSqlParser/Web/MySQL are optional as documented.
 
-Current limitation: an isolated local-repository install and external two-test consumer smoke passed, including an offline rerun, but there is no verified Maven Central artifact or Starter. This proves a local dependency-only path, not public installation availability.
+Current limitation: the core and development Starter have isolated local-repository consumer evidence, including offline repeats, but neither is available from a verified Maven Central publication. The Starter feature checkpoint also lacks remote CI and real-project adoption evidence. This proves local dependency-only paths, not public installation availability.
 
-Rollback: remove the local module/dependency and scan configuration.
+For the local 2.1.x Starter path, use `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`; it removes SmartORM component scanning but still relies on the application's existing MyBatis registration for exactly one `SmartNativeMapper`. The direct core path remains available at `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT` and keeps explicit component registration.
+
+Rollback: remove the Starter and restore explicit core component registration if retaining SmartORM, or remove the SmartORM dependency and its scan configuration entirely.
 
 ## 1️⃣ Level 1 — Opt In One Mapper
 
@@ -79,16 +81,16 @@ Rollback: retain or checkpoint the original implementation and revert one method
 
 ## 4️⃣ Level 4 — Enable Diagnostics
 
-This level is a future migration stage, not a current feature. The planned Starter may provide registered-Mapper validation, module checks, actionable failures, and redacted diagnostics.
+The minimal Starter auto-configuration exists on the 2.1.x development line, but this diagnostic level remains a future migration stage. Registered-Mapper validation, module checks, actionable failures, and redacted diagnostics are not implemented.
 
 Until that exists:
 
 - rely on focused unit/integration tests;
 - keep SQL and argument logs free of sensitive values;
-- diagnose component/Mapper scanning manually;
-- do not document a Doctor, FailureAnalyzer, or AutoConfiguration as available.
+- diagnose Mapper ownership and any direct-core component scanning manually;
+- do not document a Doctor, Validator, or FailureAnalyzer as available.
 
-There is nothing to enable or disable in 2.0.x today.
+There is no diagnostic feature to enable or disable today.
 
 ## 5️⃣ Level 5 — Scale by Application Module
 
