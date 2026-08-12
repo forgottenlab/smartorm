@@ -10,8 +10,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 
 /**
- * Auto-configures the existing SmartORM runtime graph around a native mapper
- * registered by the application's MyBatis integration.
+ * Auto-configures SmartORM's runtime graph around its one internal native Mapper
+ * while reusing the application's existing MyBatis session infrastructure.
  */
 @AutoConfiguration
 @ConditionalOnClass({
