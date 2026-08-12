@@ -1,10 +1,10 @@
 # Roadmap
 
-[English](roadmap.md) | [简体中文](roadmap.zh-CN.md)
+[English](roadmap.md) · [简体中文](roadmap.zh-CN.md)
 
-This roadmap communicates direction and quality gates. It is not implementation authorization, a release promise, or a date commitment.
+> **Summary:** This roadmap communicates sequence and quality gates. It is not implementation authorization, a release promise, or a date commitment.
 
-## Current — 2.0.x release foundation
+## 🧱 Current — 2.0.x Release Foundation
 
 Goals:
 
@@ -18,12 +18,13 @@ Goals:
 Current evidence:
 
 - 28 database-independent tests pass locally.
-- Two independent fresh MySQL 9.4.0 runs pass 46/46 tests and clean their state.
-- A randomized-order 46-test run passes.
-- CI workflow exists but has not run remotely.
-- Packaging and standalone license/release gates remain open.
+- The current 2026-08-12 fresh MySQL 9.4.0 release preflight passes 46/46 and cleans container/network/volume state to 0/0/0.
+- Two independent 2026-07-20 MySQL runs and one fixed-seed randomized-order run remain historical evidence.
+- An ordinary main JAR, sources, Javadoc, standalone license, isolated install, and external consumer smoke are locally verified.
+- The exact GitHub Actions `push/main` run for Foundation SHA `c13426d` passed the 28-test, MySQL 46-test, package, report, and cleanup gates.
+- The new local checkpoint HEAD still requires push and exact-SHA remote CI verification; signing/repository setup, Maven Central publication, tag, and release remain open.
 
-## Planned — 2.1.x adoption experience
+## 🚀 Planned — 2.1.x Adoption Experience
 
 Direction, subject to a separately approved task and consumer tests:
 
@@ -35,7 +36,7 @@ Direction, subject to a separately approved task and consumer tests:
 
 No Starter coordinate, property, AutoConfiguration class, or diagnostic API is available today.
 
-## Planned — 2.2.x API usability
+## 🧩 Planned — 2.2.x API Usability
 
 Candidates after the Starter contract is stable:
 
@@ -48,7 +49,7 @@ Candidates after the Starter contract is stable:
 
 Each item requires a compatibility design, tests, bilingual docs, and an explicit implementation task. None is part of 2.0.x.
 
-## Planned — 3.0 structural boundary
+## 🏗️ Planned — 3.0 Structural Boundary
 
 Potential major-version work:
 
@@ -61,7 +62,7 @@ Potential major-version work:
 
 This work is source/binary significant and cannot be pulled into a minor release casually.
 
-## Deferred
+## ⏸️ Deferred
 
 - PostgreSQL/MariaDB implementations until a tested dialect contract exists.
 - IntelliJ plugin.
@@ -72,7 +73,7 @@ This work is source/binary significant and cannot be pulled into a minor release
 
 Replacing MyBatis/XML/Wrapper or reimplementing MyBatis-Plus is not a product direction.
 
-## Sequence gate
+## 🚦 Sequence Gate
 
 The intended order is:
 

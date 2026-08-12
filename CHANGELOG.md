@@ -7,13 +7,20 @@
 ### Added
 - `SmartUpdate.allowFullTable` 与 `SmartDelete.allowFullTable`，默认值均为 `false`，用于显式声明有意执行全表写操作。
 - 固定 `mysql:9.4.0`、可清理且仅绑定 loopback 的 Docker Compose 测试环境，以及隔离主数据源的 Spring `test` profile。
-- Java 17 / MySQL 集成测试 GitHub Actions 工作流设计与 Surefire 报告归档步骤；该工作流尚未远程运行验证。
+- Java 17 / MySQL 集成测试 GitHub Actions 工作流与 Surefire 报告归档步骤；Foundation SHA `c13426d` 的精确远程运行已通过。
 - 英文默认 `README.md`、中文 `README.zh-CN.md`，以及双语 Getting Started、Migration、Safety、Testing、Architecture、Compatibility、Roadmap 和 Release Checklist。
+- 仓库级 Apache License 2.0 `LICENSE` 文件。
+- 普通库主 JAR、sources JAR、Javadoc JAR 与类发布 POM 的本地构建/检查链路，以及隔离本地仓库的外部使用方 smoke test。
 
 ### Changed
 - `SmartUpdate` / `SmartDelete` 现在基于最终结构化 WHERE 谓词默认拒绝无条件全表操作；此前依赖空 WHERE 的调用需要显式设置 `allowFullTable = true`。
 - 公开文档明确将 SmartORM 定位为 Spring Boot 与 MyBatis-Plus 的按需增强，而不是 MyBatis、MyBatis-Plus、Wrapper、XML、Provider 或 MPJ 的替代品。
+- 双语 README 采用对齐的 GitHub Hero、真实 badge、能力/适用场景/测试证据表格与安全提示；公开文档统一语言切换、摘要和可扫读标题层级。
+- Testing 与 Release Checklist 现在明确区分本轮全新 MySQL 46/46 本地 preflight、保留的历史数据库证据、已验证的 Foundation 远程 CI 与仍待 push 的新 checkpoint HEAD。
 - 数据库测试改为显式激活隔离 `test` profile，并强化确定性 fixture、行数、分页、异常和 JOIN 断言。
+- 发布 artifacts 排除 demo class、`application.yaml` 与 demo SQL；demo 源码仍保留在当前单模块仓库中。
+- JSqlParser 改为 optional，Spring Web 与 MySQL Connector/J 改为 runtime + optional；由于公开 Mapper 类型边界，MyBatis-Plus-Join 保持传递依赖。
+- Maven package 生成普通库 JAR，并附加 sources/Javadoc artifacts；这不代表 Maven Central 已发布。
 
 ### Fixed
 - 修复 Native SQL 使用原方法参数索引访问紧凑绑定列表导致的乱序/稀疏参数错误。

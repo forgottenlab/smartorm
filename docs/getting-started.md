@@ -1,10 +1,10 @@
 # Getting Started
 
-[English](getting-started.md) | [简体中文](getting-started.zh-CN.md)
+[English](getting-started.md) · [简体中文](getting-started.zh-CN.md)
 
-This guide describes the current 2.0.x source/local-module integration. SmartORM does not yet provide a published Spring Boot Starter or verified Maven Central artifact.
+> **Summary:** Start with one Mapper and one tested method. SmartORM 2.0.x supports source/local-module and locally installed artifact paths; it does not yet provide a published Spring Boot Starter or Maven Central artifact.
 
-## Requirements
+## ✅ Requirements
 
 - Java 17.
 - Spring Boot 3.5.5 for the verified repository point.
@@ -14,13 +14,25 @@ This guide describes the current 2.0.x source/local-module integration. SmartORM
 
 Other versions may work, but they are not currently verified support claims.
 
-## Add the current project
+## 📦 Add the Current Project
 
-For evaluation, open this repository as a Maven project or include it as a local source module. The project coordinates are `io.github.forgottenlab:smartorm:2.0.0`, but public repository availability has not been verified.
+For evaluation, open this repository as a Maven project, include it as a local source module, or install the current artifact into a Maven repository available only to your evaluation environment. The isolated install plus an external two-test consumer smoke passed, including an offline rerun.
 
-The current single artifact also contains demo code and direct MPJ, MySQL, and Web dependencies. Review [Compatibility](compatibility.md) before adopting it in another project.
+After that local install, a consumer can use the current coordinates:
 
-## Register current runtime components
+```xml
+<dependency>
+    <groupId>io.github.forgottenlab</groupId>
+    <artifactId>smartorm</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
+
+These coordinates are not available from Maven Central as part of this preflight. The release-shaped main JAR excludes demo classes, `application.yaml`, and demo SQL even though the repository remains one source module containing the demo.
+
+MyBatis-Plus-Join remains transitive. JSqlParser is optional; Spring Web and MySQL Connector/J are runtime-optional. Add optional capabilities explicitly when your application needs them. Review [Compatibility](compatibility.md) before adopting SmartORM in another project.
+
+## 🔧 Register Current Runtime Components
 
 There is no AutoConfiguration yet. A consuming application must scan SmartORM components and the internal native Mapper in addition to its own packages:
 
@@ -39,7 +51,7 @@ public class ExampleApplication {
 
 If you use `@SmartPage`, register the MyBatis-Plus pagination interceptor as your application normally would. The repository demo provides a current example in `MyBatisConfig`.
 
-## Define an entity
+## 🧱 Define an Entity
 
 SmartORM uses the same MyBatis-Plus entity metadata:
 
@@ -59,7 +71,7 @@ public class User {
 }
 ```
 
-## Define the first Mapper
+## ⚡ Define the First Mapper
 
 ```java
 public interface UserMapper extends SmartMapper<User> {
@@ -75,11 +87,11 @@ public interface UserMapper extends SmartMapper<User> {
 
 `#{0}` references the first Java method argument. Keep field names and SQL structure developer-authored and static; runtime scalar values belong in placeholders.
 
-## Keep existing MyBatis-Plus code
+## 🔁 Keep Existing MyBatis-Plus Code
 
 The same Mapper can continue to use inherited `BaseMapper` methods, Wrapper calls, XML statements, Provider methods, and unannotated custom methods. SmartORM intercepts only methods carrying an active Smart annotation.
 
-## Verify the first method
+## 🧪 Verify the First Method
 
 Use a transaction-scoped integration test that creates its own fixture:
 
@@ -108,7 +120,7 @@ class UserMapperTest {
 
 For repository tests, follow [Testing](testing.md); never point the destructive demo schema script at an existing database.
 
-## Common errors
+## 🩺 Common Errors
 
 ### No Smart handler or Aspect is active
 
@@ -138,7 +150,7 @@ Confirm the MyBatis-Plus pagination interceptor is registered and that page/orde
 
 SmartORM rejects `@SmartUpdate` and `@SmartDelete` when no effective `WHERE` predicate is generated. Do not bypass the guard unless a reviewed full-table operation is intentional; see [Safety](safety.md).
 
-## Next reading
+## 📚 Next Reading
 
 - [Migration from MyBatis-Plus](migration-from-mybatis-plus.md)
 - [Safety](safety.md)

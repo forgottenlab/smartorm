@@ -1,68 +1,68 @@
 # Release Checklist
 
-[English](release-checklist.md) | [简体中文](release-checklist.zh-CN.md)
+[English](release-checklist.md) · [简体中文](release-checklist.zh-CN.md)
 
-This checklist is a preflight record, not permission to publish. Every release action requires separate explicit authorization.
+> **Summary:** This is an evidence ledger, not permission to publish. Local verification, remote verification, pending release work, and future product plans are deliberately separate.
 
-## Test foundation
+## 🧭 Status Vocabulary
 
-- [x] Database-independent suite exists: 28 tests.
-- [x] Disposable MySQL 9.4.0 environment exists with project-owned cleanup.
-- [x] Two independent fresh database runs passed 46/46 on 2026-07-20.
-- [x] Fixed-seed randomized-order database run passed 46/46.
-- [ ] GitHub Actions workflow has completed successfully on the release commit.
-- [ ] Release-candidate checks have been rerun from the exact release commit.
+| Status | Meaning |
+|---|---|
+| ✅ Complete | The repository deliverable or documentation exists |
+| 🧪 Locally Verified | The exact local command or isolated environment passed |
+| ☁️ Remotely Verified | The exact remote workflow/repository action was observed passing |
+| ⏳ Pending | Required release work has not been completed |
+| ⚠️ Blocked | A named environment or evidence boundary currently prevents verification |
+| 🗺️ Planned | Future product work; not implemented and not a release gate for 2.0.x |
 
-## Documentation
+## 🧪 Test Foundation
 
-- [x] English default README and aligned Chinese README exist.
-- [x] Getting Started, Migration, Safety, Testing, Architecture, Compatibility, and Roadmap exist in both languages.
-- [x] Current and planned behavior are visibly separated.
-- [x] Unsupported compatibility and unpublished Starter/artifact claims are avoided.
-- [ ] Standalone repository license file exists and matches the POM declaration.
-- [ ] Contribution/security policies required for the public project are reviewed.
+| Gate | Status | Evidence / next condition |
+|---|---|---|
+| 28 database-independent regressions | 🧪 Locally Verified | Current preflight: 28/28 |
+| Disposable MySQL 9.4.0 environment | ✅ Complete | Pinned image, loopback binding, isolated profile, project-owned cleanup |
+| Historical clean double-run | 🧪 Locally Verified | 2026-07-20: two independent 46/46 runs |
+| Historical random-order probe | 🧪 Locally Verified | Seed `20260720`: 46/46 |
+| Current fresh MySQL release preflight | 🧪 Locally Verified | 2026-08-12: 46/46, 0 failures/errors/skips, residue 0/0/0 |
+| GitHub Actions workflow definition | ✅ Complete | JDK 17, 28/46 suites, package, report upload, always-cleanup |
+| `c13426d` remote workflow result | ☁️ Remotely Verified | Exact `push/main` run `30647688231` passed all release-gate steps |
+| Exact future release-commit rerun | ⏳ Pending | Requires a reviewed immutable release candidate |
 
-## Compatibility and migration
+## 📚 Documentation
 
-- [x] Exact verified Java/Spring Boot/MyBatis-Plus/MPJ/MySQL point is documented.
-- [x] Unverified databases, versions, build tools, and consumer paths are listed.
-- [x] Incremental migration and rollback guidance exists.
-- [x] Full-table mutation opt-in and protection scope are documented.
-- [ ] A clean external consumer project verifies the public artifact and integration path.
+| Gate | Status | Evidence / next condition |
+|---|---|---|
+| English landing README and aligned Chinese README | ✅ Complete | Hero, truthful badges, capability/adoption tables, safety and evidence |
+| Bilingual Getting Started, Migration, Safety, Testing, Architecture, Compatibility, Roadmap, Release Checklist | ✅ Complete | Current/planned behavior remains visibly separated |
+| Standalone Apache License 2.0 file | ✅ Complete | Root `LICENSE` matches the POM declaration |
+| Public Markdown links and privacy scan | 🧪 Locally Verified | Current preflight validation |
+| Contribution and security policies | ⏳ Pending | Review `CONTRIBUTING.md` and `SECURITY.md` in an independent task |
 
-## Artifact verification
+## 📦 Compatibility and Artifacts
 
-- [ ] `mvn package` succeeds from a clean environment.
-- [ ] Source and Javadoc artifacts are generated and inspected.
-- [ ] Artifact contents exclude demo-only/sensitive/generated files as intended.
-- [ ] POM metadata, SCM, license, developers, coordinates, and version are reviewed.
-- [ ] Reproducibility/checksum expectations are defined.
-- [ ] Signing and repository requirements are validated without publishing.
+| Gate | Status | Evidence / next condition |
+|---|---|---|
+| Exact Java/Boot/MP/MPJ/MySQL point documented | ✅ Complete | Unsupported versions and databases remain explicit |
+| Incremental migration and rollback guidance | ✅ Complete | Existing BaseMapper/Wrapper/XML/Provider/MPJ paths remain valid |
+| Ordinary main JAR plus sources/Javadoc/POM | 🧪 Locally Verified | Package and archive inspection pass without ignored Javadoc errors |
+| Demo classes/configuration/SQL excluded from artifacts | 🧪 Locally Verified | Repository demo source remains available |
+| Isolated local install and consumer smoke | 🧪 Locally Verified | Two consumer tests, including an offline repeat |
+| Javadoc warning policy | ⏳ Pending | Generation passes; documentation-quality warnings require an owner threshold |
+| Source author-email attribution decision | ⏳ Pending | Existing attribution is not a secret, but publication policy needs owner acceptance |
+| Bit-for-bit reproducibility expectation | ⏳ Pending | ZIP timestamps are not normalized; no reproducibility claim |
 
-Current blocker: local offline packaging cannot resolve `maven-jar-plugin:3.4.2` from cache.
+## 🚦 Git and Publication Gates
 
-## Git preflight
+| Gate | Status | Evidence / next condition |
+|---|---|---|
+| Build/docs changes split into reviewed local checkpoints | 🧪 Locally Verified | Two explicit-path local commits; boundaries checked before and after commit |
+| Clean exact release commit | 🧪 Locally Verified | Local checkpoint HEAD is clean; push and exact-SHA remote validation remain pending |
+| Maven Central availability | ⏳ Pending | No Central Portal publication, signing, or repository acceptance |
+| Spring Boot Starter | 🗺️ Planned | Not implemented and must not enter 2.0.x finalization |
+| Tag, push, GitHub Release | ⏳ Pending | Require separate explicit authorization |
 
-- [ ] Working tree is clean.
-- [ ] Release diff contains no unrelated user files, `.ai/history`, logs, build outputs, or secrets.
-- [ ] Branch, HEAD, remote, and intended tag are reviewed.
-- [ ] Required local commits are separated and reviewed.
-- [ ] No force-push or remote-history rewrite is required.
+## 📋 Current Decision
 
-The current working tree is intentionally not clean and includes protected user changes; it is not release-ready.
+`READY_FOR_PUSH_AND_REMOTE_CI`.
 
-## Changelog and release notes
-
-- [x] `CHANGELOG.md` has an `[Unreleased]` section.
-- [ ] Final version/date and complete user-visible changes are reviewed.
-- [ ] Release notes describe installation reality, safety baseline, compatibility, limitations, and migration.
-- [ ] Links in release notes resolve against the release tag.
-- [ ] Known issues and rollback guidance are included.
-
-## Authorization gate
-
-- [ ] User explicitly authorizes commit/tag/push/release actions for the exact reviewed state.
-- [ ] Publication credentials and remote repository access are handled outside documentation/logs.
-- [ ] Post-release verification and rollback owner are assigned.
-
-No release, tag, push, or publication was executed while creating this checklist.
+The local Docker/MySQL, 28-test, package, artifact, and checkpoint-boundary gates are verified. Foundation SHA `c13426d` also passed its exact remote workflow, but the new local checkpoint HEAD has not been pushed or remotely verified. Signing/repository setup, Maven Central publication, tag, and release remain pending; no bit-for-bit reproducibility claim is made.

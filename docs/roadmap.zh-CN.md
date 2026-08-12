@@ -1,10 +1,10 @@
 # 路线图
 
-[English](roadmap.md) | [简体中文](roadmap.zh-CN.md)
+[English](roadmap.md) · [简体中文](roadmap.zh-CN.md)
 
-本路线图用于说明方向与质量门禁，不代表实现授权、发布承诺或日期承诺。
+> **摘要：** 本路线图用于说明演进顺序与质量门禁，不代表实现授权、发布承诺或日期承诺。
 
-## Current — 2.0.x release foundation
+## 🧱 Current — 2.0.x Release Foundation
 
 目标：
 
@@ -18,12 +18,13 @@
 当前证据：
 
 - 28 个数据库无关测试在本地通过。
-- 两个独立全新 MySQL 9.4.0 环境各通过 46/46 测试并清理状态。
-- 一轮随机顺序 46 测试通过。
-- CI workflow 已存在，但未远程运行。
-- Package、独立许可证与发布门禁仍未闭环。
+- 本轮 2026-08-12 全新 MySQL 9.4.0 release preflight 通过 46/46，并把 container/network/volume 清理至 0/0/0。
+- 2026-07-20 两个独立 MySQL 运行与一轮固定 seed 随机顺序运行作为历史证据保留。
+- 普通主 JAR、sources、Javadoc、独立许可证、隔离 install 与外部使用方 smoke 已在本地验证。
+- Foundation SHA `c13426d` 的精确 GitHub Actions `push/main` 运行已通过 28 测试、MySQL 46 测试、package、报告与 cleanup 门禁。
+- 新的本地 checkpoint HEAD 仍需 push 与精确 SHA 远程 CI 验证；签名/仓库设置、Maven Central 发布、tag 与 release 仍待完成。
 
-## Planned — 2.1.x 接入体验
+## 🚀 Planned — 2.1.x 接入体验
 
 方向如下，但必须由独立获批任务和使用方测试驱动：
 
@@ -35,7 +36,7 @@
 
 当前不存在可用的 Starter 坐标、属性、AutoConfiguration 类或诊断 API。
 
-## Planned — 2.2.x API 易用性
+## 🧩 Planned — 2.2.x API 易用性
 
 Starter 契约稳定后的候选项：
 
@@ -48,7 +49,7 @@ Starter 契约稳定后的候选项：
 
 每项都需要兼容性设计、测试、双语文档和明确实现任务，均不属于 2.0.x。
 
-## Planned — 3.0 结构边界
+## 🏗️ Planned — 3.0 结构边界
 
 可能的 major version 工作：
 
@@ -61,7 +62,7 @@ Starter 契约稳定后的候选项：
 
 这类工作会影响源码/二进制兼容性，不能随意提前到 minor release。
 
-## Deferred
+## ⏸️ Deferred
 
 - 在存在经过测试的方言契约前，推迟 PostgreSQL/MariaDB 实现。
 - IntelliJ plugin。
@@ -72,7 +73,7 @@ Starter 契约稳定后的候选项：
 
 替代 MyBatis/XML/Wrapper 或重新实现 MyBatis-Plus 不是产品方向。
 
-## 顺序门禁
+## 🚦 顺序门禁
 
 预期顺序：
 

@@ -1,33 +1,35 @@
 # Migration from MyBatis-Plus
 
-[English](migration-from-mybatis-plus.md) | [简体中文](migration-from-mybatis-plus.zh-CN.md)
+[English](migration-from-mybatis-plus.md) · [简体中文](migration-from-mybatis-plus.zh-CN.md)
 
-SmartORM is an enhancement, not a replacement. Migration should be incremental, test-driven, and reversible. Existing `BaseMapper`, Wrapper, XML, Provider, MyBatis-Plus annotations, and MyBatis-Plus-Join implementations remain valid.
+> **Summary:** SmartORM is an enhancement, not a replacement. Migrate incrementally, prove behavior with deterministic tests, and keep a per-method rollback path.
 
-## Availability map
+Existing `BaseMapper`, Wrapper, XML, Provider, MyBatis-Plus annotations, and MyBatis-Plus-Join implementations remain valid.
+
+## 🧭 Availability Map
 
 | Level | Goal | Current 2.0.x status |
 |---|---|---|
-| 0 | Add the current source/local module without method migration | Available for evaluation; published dependency-only onboarding is not verified |
+| 0 | Add the current source/local module or locally installed artifact without method migration | Local artifact consumer smoke verified; public repository onboarding is not verified |
 | 1 | Opt in one Mapper | Implemented |
 | 2 | Opt in one method | Implemented |
 | 3 | Replace repeated fixed-shape SQL selectively | Implemented with tests required |
 | 4 | Enable consumer diagnostics | Planned for a future Starter; not available today |
 | 5 | Scale by application module | Process guidance; requires your own regression and rollback controls |
 
-## Level 0 — Keep existing behavior
+## 0️⃣ Level 0 — Keep Existing Behavior
 
 Start in a branch or local evaluation module. Do not change Mapper inheritance or methods yet.
 
 - Keep `BaseMapper`, XML, Wrapper, Provider, and existing MPJ code unchanged.
 - Run the existing application and test suite before and after adding the local module.
-- Record the current dependency surface: the 2.0.x artifact is still single-module and includes demo, MPJ, MySQL, and Web dependencies.
+- Record the current dependency surface: the repository is still single-module; release artifacts exclude demo classes/configuration/SQL, MPJ remains transitive, and JSqlParser/Web/MySQL are optional as documented.
 
-Current limitation: there is no verified Maven Central artifact or Starter, so “dependency only” is a compatibility goal rather than a proven public installation experience.
+Current limitation: an isolated local-repository install and external two-test consumer smoke passed, including an offline rerun, but there is no verified Maven Central artifact or Starter. This proves a local dependency-only path, not public installation availability.
 
 Rollback: remove the local module/dependency and scan configuration.
 
-## Level 1 — Opt in one Mapper
+## 1️⃣ Level 1 — Opt In One Mapper
 
 Change one low-risk Mapper:
 
@@ -42,7 +44,7 @@ Current 2.0.x note: `SmartMapper` also extends `MPJBaseMapper`; MPJ is therefore
 
 Rollback: restore `BaseMapper<User>` and remove only SmartORM-specific methods/hooks from that Mapper.
 
-## Level 2 — Migrate one method
+## 2️⃣ Level 2 — Migrate One Method
 
 Choose a deterministic, fixed-shape method with existing tests:
 
@@ -61,7 +63,7 @@ Recommended sequence:
 
 Rollback: switch callers back and remove the annotated method. Other Mapper methods are unaffected.
 
-## Level 3 — Replace repetitive template SQL
+## 3️⃣ Level 3 — Replace Repetitive Template SQL
 
 Good candidates:
 
@@ -75,7 +77,7 @@ Do not migrate merely to maximize SmartORM usage. Preserve complex or mature cod
 
 Rollback: retain or checkpoint the original implementation and revert one method at a time.
 
-## Level 4 — Enable diagnostics
+## 4️⃣ Level 4 — Enable Diagnostics
 
 This level is a future migration stage, not a current feature. The planned Starter may provide registered-Mapper validation, module checks, actionable failures, and redacted diagnostics.
 
@@ -88,7 +90,7 @@ Until that exists:
 
 There is nothing to enable or disable in 2.0.x today.
 
-## Level 5 — Scale by application module
+## 5️⃣ Level 5 — Scale by Application Module
 
 Only expand after Levels 1–3 are stable for a representative period.
 
@@ -98,7 +100,7 @@ Only expand after Levels 1–3 are stable for a representative period.
 - Stop the migration wave when behavior is ambiguous or the escape hatch is better.
 - Keep the dependency if other modules still use SmartORM; rollback only the affected module.
 
-## When not to migrate
+## 🚫 When Not to Migrate
 
 Do not migrate these merely for consistency:
 
@@ -110,19 +112,19 @@ Do not migrate these merely for consistency:
 - code without deterministic regression and rollback coverage;
 - arbitrary client-controlled fields, operators, ordering, or SQL fragments.
 
-## JOIN migration notes
+## 🔗 JOIN Migration Notes
 
 Current 2.0.x JOIN declarations use the native SQL path, and `SmartMapper` directly inherits MPJ. Validate row multiplicity, aliases, explicit/inferred `ON`, placeholder order, DTO mapping, and pagination totals.
 
 The proposed separate JOIN module and `SmartJoinMapper` belong to the 3.0 roadmap. They are not current coordinates or APIs.
 
-## Write migration safety
+## 🛡️ Write Migration Safety
 
 `@SmartUpdate` and `@SmartDelete` fail closed when no effective `WHERE` predicate is generated. If legacy code intentionally performs a full-table operation, migration requires an explicit method-level review and `allowFullTable = true` declaration.
 
 Do not use the opt-in to silence a missing/incorrect predicate. See [Safety](safety.md).
 
-## Before migration
+## ✅ Before Migration
 
 - [ ] The project matches the exact verified compatibility point or has its own matrix.
 - [ ] Existing behavior is covered for rows, ordering, nulls, exceptions, totals, and database effects.
@@ -131,7 +133,7 @@ Do not use the opt-in to silence a missing/incorrect predicate. See [Safety](saf
 - [ ] A rollback implementation and owner exist.
 - [ ] Write operations have an effective predicate or reviewed full-table intent.
 
-## After migration
+## 🧪 After Migration
 
 - [ ] Legacy and SmartORM behavior match on deterministic fixtures.
 - [ ] Placeholder count and order are correct.

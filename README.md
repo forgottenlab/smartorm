@@ -1,70 +1,71 @@
+<div align="center">
+
 # SmartORM
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+**Opt-in, annotation-driven enhancements for Spring Boot and MyBatis-Plus.**
 
-> SmartORM is an opt-in, annotation-driven enhancement library for MyBatis-Plus applications built with Spring Boot.
+[English](README.md) · [简体中文](README.zh-CN.md)
 
-SmartORM reduces repetitive Mapper code for fixed-shape CRUD, pagination, result mapping, and JOIN queries while preserving the MyBatis-Plus programming model. Adoption is incremental: existing `BaseMapper`, Wrapper, XML, Provider, and MyBatis-Plus-Join code can remain in place while selected Mappers and methods opt in.
+[![Test](https://github.com/forgottenlab/smartorm/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/forgottenlab/smartorm/actions/workflows/test.yml)
+![Java 17](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![Spring Boot 3.5.5](https://img.shields.io/badge/Spring%20Boot-3.5.5-6DB33F?logo=springboot&logoColor=white)
+![MyBatis--Plus 3.5.14](https://img.shields.io/badge/MyBatis--Plus-3.5.14-1F6FEB)
+[![Apache License 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-## Project status
+</div>
 
-SmartORM 2.0.x is currently a source-first release foundation, not a published Spring Boot Starter.
+## ✨ Why SmartORM?
 
-- The repository builds with Java 17 and Spring Boot 3.5.5.
-- Database-independent regressions and disposable MySQL 9.4 integration tests are established locally.
-- A GitHub Actions workflow exists, but no remote CI run is claimed yet.
-- Maven Central publication, consumer-grade auto-configuration, and a multi-module layout are future work.
+SmartORM is an opt-in, annotation-driven enhancement library for MyBatis-Plus applications built with Spring Boot.
 
-Use the current repository for evaluation, local source-module integration, and contribution. Do not treat the coordinates in `pom.xml` as proof that a public artifact is available.
+It removes repetitive, fixed-shape Mapper code while preserving the MyBatis-Plus programming model and its escape hatches. Adoption is incremental: choose one Mapper and one method, keep existing paths beside it, and roll back without redesigning the application.
 
-## What SmartORM is
+> [!NOTE]
+> SmartORM 2.0.x is currently available through source or a locally installed Maven artifact. The library JAR and local consumer path are verified, but Maven Central publication and a Spring Boot Starter are not available yet.
 
-SmartORM is a focused enhancement layer for teams that already use Spring Boot and MyBatis-Plus. It adds declarative Mapper annotations and routes them through a structured runtime pipeline:
+## 🚀 What It Provides
 
-```text
-Mapper method
-  -> Aspect
-  -> Handler
-  -> Resolver
-  -> Builder or SQL Renderer
-  -> Executor
-```
+| Capability | Status | Current behavior |
+|---|---|---|
+| Annotation-driven CRUD | ✅ Available | `@SmartSelect`, `@SmartInsert`, `@SmartUpdate`, and `@SmartDelete` opt in per Mapper method |
+| Pagination | ✅ Available | `@SmartPage` and `PageResult`; the application registers the MyBatis-Plus pagination interceptor |
+| DTO / `Map` mapping | ✅ Available | Query result inference supports entity, `Map`, DTO/VO, and single-result paths |
+| Native SQL path | ✅ Available | Rendered SQL keeps placeholder order aligned with its compact bound-parameter list |
+| Fixed JOIN declarations | ✅ Available | `@SmartJoin` supports explicit or convention-inferred `ON`; the current implementation is MPJ-based |
+| Mutation safety | ✅ Available | Smart update/delete operations without an effective `WHERE` are blocked by default |
+| Lifecycle hooks | ✅ Available | `beforeSmartOperation`, `afterSmartOperation`, and `onSmartException` |
+| Spring Boot Starter | 🗺️ Planned | Not implemented; current integration uses explicit component and Mapper scanning |
 
-It is a good fit when you want to reduce repeated, fixed-shape Mapper code without replacing the escape hatches already provided by MyBatis and MyBatis-Plus.
+`@SmartQuery` is an inactive placeholder, not a supported execution entry point.
 
-## What SmartORM is not
+## 🎯 When to Use It
 
-SmartORM is not:
+| Good fit | Consider alternatives |
+|---|---|
+| Spring Boot applications already using MyBatis-Plus<br>Fixed CRUD and deterministic pagination<br>DTO / `Map` projections and fixed JOINs<br>Repeated Mapper template SQL<br>Teams that want gradual, reversible adoption | Non-Spring or reactive applications<br>Highly dynamic or database-specific SQL<br>Stored procedures<br>Mature complex XML/Provider SQL with no maintenance problem<br>Projects requiring a currently verified multi-database dialect layer |
 
-- a replacement ORM;
-- a replacement for MyBatis or MyBatis-Plus;
-- a replacement for `BaseMapper`, Wrapper, XML, or Provider SQL;
-- a replacement for MyBatis-Plus-Join;
-- a general-purpose dynamic SQL language;
-- a published Spring Boot Starter today.
+## 🚫 What It Does Not Replace
 
-Keep complex dynamic SQL, stored procedures, database-specific statements, and already-stable XML/Provider code on their existing paths unless migration has a clear maintenance benefit.
+> [!IMPORTANT]
+> SmartORM does not replace MyBatis, MyBatis-Plus, `BaseMapper`, Wrapper, XML, Provider SQL, or MyBatis-Plus-Join. Despite its name, it is not a full ORM replacement; keep existing paths whenever they are clearer or more capable.
 
-## Implemented features
+## ⚡ 30-Second Example
 
-- Annotation-driven select, insert, update, delete, and page operations.
-- Entity, `Map`, DTO/VO, single-result, and `PageResult` paths.
-- Fixed JOIN declarations with inferred or explicit `ON` predicates.
-- Native SQL rendering with ordered scalar parameter binding.
-- `SmartMapper` convenience methods and lifecycle hooks.
-- Safe-by-default rejection of `@SmartUpdate` and `@SmartDelete` operations with no effective `WHERE` predicate.
-
-`@SmartQuery` exists as an inactive placeholder and is not a supported execution entry point.
-
-## Quick start
-
-### 1. Use the current source module
-
-A public Maven Central artifact has not been verified. For evaluation, open this repository as a Maven project or include the current source as a local module. The current integration requires component and Mapper scanning equivalent to the demo configuration; the [Getting Started guide](docs/getting-started.md) shows the exact setup.
-
-### 2. Define one opt-in Mapper method
+SmartORM keeps MyBatis-Plus entity metadata and adds an opt-in annotation to the Mapper method:
 
 ```java
+@TableName("user")
+class User {
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
+    @TableField("user_name")
+    private String userName;
+
+    private Integer status;
+    // getters and setters
+}
+
 public interface UserMapper extends SmartMapper<User> {
 
     @SmartSelect(
@@ -74,84 +75,88 @@ public interface UserMapper extends SmartMapper<User> {
     )
     List<User> findByStatus(Integer status);
 }
+
+List<User> activeUsers = userMapper.findByStatus(1);
 ```
 
-Unannotated Mapper methods continue to use their normal MyBatis-Plus, XML, Wrapper, or Provider implementation.
+`#{0}` refers to the first Java method argument. Unannotated methods continue to use normal MyBatis-Plus, Wrapper, XML, or Provider behavior. See [Getting Started](docs/getting-started.md) for the required scan configuration.
 
-### 3. Verify the declaration
+## 📦 Installation
 
-Add a deterministic integration test that creates its own fixture and checks rows, ordering, null behavior, and database effects. Numeric placeholders refer to the Java method argument index, starting at `#{0}`.
+Maven Central publication is not available yet. After cloning and validating the repository, install the current artifact into your local Maven repository:
 
-See [Getting Started](docs/getting-started.md) for the current scan configuration, entity example, test setup, and common errors.
+```powershell
+mvn -DskipTests install
+```
 
-## Installation reality
+Then a local consumer can use the current coordinates:
 
-Current verified usage is source/local-module based. The repository declares:
+```xml
+<dependency>
+    <groupId>io.github.forgottenlab</groupId>
+    <artifactId>smartorm</artifactId>
+    <version>2.0.0</version>
+</dependency>
+```
+
+Run the test gates separately before relying on `-DskipTests`; the command above only installs an already-validated local build. The main artifact is an ordinary library JAR. Demo classes, `application.yaml`, and demo SQL are excluded. MyBatis-Plus-Join remains transitive because it is exposed by `SmartMapper`; JSqlParser, Spring Web, and MySQL Connector/J retain the dependency boundaries documented in [Compatibility](docs/compatibility.md).
+
+## 🛡️ Safe by Default
+
+> [!WARNING]
+> Full-table SmartORM updates and deletes are blocked by default. Native/JOIN runtime scalar values use ordered parameter bindings, while SQL structure remains developer-authored metadata. An intentional full-table operation requires method-level `allowFullTable = true`; there is no global switch that disables this guard.
+
+The opt-in bypasses only the missing-effective-`WHERE` refusal. It does not add authorization, transactions, rollback, input validation, or database protection. SmartORM does not claim universal SQL-injection prevention; keep structural fragments static and review the exact [Safety](docs/safety.md) boundary.
+
+## 🧪 Verified Testing
+
+| Layer | Scope | Evidence |
+|---|---|---|
+| Database-independent regressions | Native SQL rendering/binding and mutation safety | Current preflight: 28/28 passed |
+| Historical MySQL double-run | Two independently created `mysql:9.4.0` volumes | 2026-07-20: 46/46 twice, followed by cleanup |
+| Historical random-order probe | Fixed seed `20260720` | 2026-07-20: 46/46, followed by cleanup |
+| Current MySQL release preflight | Fresh `smartorm-release-preflight` Compose project | 2026-08-12: 46/46; 0 failures/errors/skips; container/network/volume residue 0/0/0 |
+| GitHub Actions | JDK 17, 28 tests, MySQL suite, package, reports, cleanup | Foundation SHA `c13426d`: exact `push/main` run passed every gate |
+
+Compilation, package, and artifact checks are also part of the local release preflight. Each layer proves a different boundary; historical runs are not presented as current evidence. See [Testing](docs/testing.md).
+
+## 🧱 Architecture at a Glance
 
 ```text
-io.github.forgottenlab:smartorm:2.0.0
+Annotated Mapper method
+  -> Aspect
+  -> Handler
+  -> Resolver / Meta
+  -> Wrapper Builder or SQL Renderer
+  -> Executor
+  -> MyBatis-Plus / MyBatis
 ```
 
-These coordinates describe the project but are not a claim that Maven Central publication has completed. A future Starter is listed on the roadmap and must not be added to current build files.
+SmartORM remains a single Maven source module. Its release-shaped artifacts exclude demo classes and configuration, but there is no Starter, AutoConfiguration, physical child module, or optional JOIN module today. See [Architecture](docs/architecture.md).
 
-## Migration from MyBatis-Plus
+## 📚 Documentation
 
-Migration is incremental and reversible:
+| Topic | English | 简体中文 |
+|---|---|---|
+| Getting Started | [Guide](docs/getting-started.md) | [指南](docs/getting-started.zh-CN.md) |
+| Migration | [Guide](docs/migration-from-mybatis-plus.md) | [指南](docs/migration-from-mybatis-plus.zh-CN.md) |
+| Safety | [Guide](docs/safety.md) | [指南](docs/safety.zh-CN.md) |
+| Testing | [Evidence](docs/testing.md) | [证据](docs/testing.zh-CN.md) |
+| Architecture | [Current boundaries](docs/architecture.md) | [当前边界](docs/architecture.zh-CN.md) |
+| Compatibility | [Matrix](docs/compatibility.md) | [矩阵](docs/compatibility.zh-CN.md) |
+| Roadmap | [Planned direction](docs/roadmap.md) | [规划方向](docs/roadmap.zh-CN.md) |
+| Release Checklist | [Preflight](docs/release-checklist.md) | [发布预检](docs/release-checklist.zh-CN.md) |
 
-1. keep the existing dependency and Mapper behavior;
-2. opt in one Mapper;
-3. migrate one well-tested method;
-4. replace only repetitive fixed-shape SQL;
-5. scale by application module only after comparison and rollback checks.
+See also the [Changelog](CHANGELOG.md).
 
-Existing `BaseMapper`, Wrapper, XML, Provider, and MyBatis-Plus-Join code remains valid. See [Migration from MyBatis-Plus](docs/migration-from-mybatis-plus.md).
+## 🗺️ Roadmap
 
-## Safety
+The roadmap currently proposes a consumer-tested Starter after the 2.0.x foundation, focused API usability work later in 2.x, and physical module separation only in a future major version. These are plans, not delivered APIs, coordinates, dates, or implementation authorization. See the [Roadmap](docs/roadmap.md).
 
-`@SmartUpdate` and `@SmartDelete` reject execution when the final generated Wrapper has no effective `WHERE` predicate. A deliberate full-table operation requires a method-level declaration:
+## 🤝 Contributing and Feedback
 
-```java
-@SmartDelete(allowFullTable = true)
-int deleteAllRows();
-```
+Focused issues and pull requests are welcome. Please include the compatibility point, a minimal reproducer, and the smallest relevant test. Keep public API, safety, migration, and bilingual documentation implications explicit; contribution and security policies remain release follow-up work.
 
-This opt-in bypasses only the empty-`WHERE` guard. It does not relax any other parsing, SQL, transaction, authorization, or database protection. Review the full [Safety guide](docs/safety.md) before using write annotations.
+## 📜 License
 
-## Testing evidence
-
-Current local evidence for the exact repository baseline:
-
-- 28 database-independent tests: passed.
-- 46 MySQL integration tests against disposable `mysql:9.4.0`: passed twice from independently created volumes.
-- A separate fixed-seed randomized class/method-order run: 46 passed.
-- Task-owned containers, volumes, and networks were removed after each run.
-
-The workflow in `.github/workflows/test.yml` mirrors this baseline, but it has not been confirmed by a remote GitHub Actions run. See [Testing](docs/testing.md).
-
-## Documentation
-
-- [Getting Started](docs/getting-started.md)
-- [Migration from MyBatis-Plus](docs/migration-from-mybatis-plus.md)
-- [Safety](docs/safety.md)
-- [Testing](docs/testing.md)
-- [Architecture](docs/architecture.md)
-- [Compatibility](docs/compatibility.md)
-- [Roadmap](docs/roadmap.md)
-- [Release checklist](docs/release-checklist.md)
-- [Changelog](CHANGELOG.md)
-
-Chinese versions are available from the language switch at the top of each public document.
-
-## Compatibility summary
-
-The verified point is Java 17, Spring Boot 3.5.5, MyBatis-Plus 3.5.14, MyBatis-Plus-Join 1.5.5, and MySQL 9.4.0. This is one tested point, not a broad supported range. PostgreSQL, MariaDB, other Java/Spring versions, Gradle consumers, and published-artifact consumption remain unverified.
-
-See the [Compatibility matrix](docs/compatibility.md) for exact evidence and limitations.
-
-## Roadmap boundary
-
-Starter auto-configuration is planned for 2.1.x, API usability work for 2.2.x, and physical module separation for 3.0. These are directions, not delivered features, dates, or implementation authorization. See the [Roadmap](docs/roadmap.md).
-
-## License and release readiness
-
-The POM declares Apache License 2.0. A standalone repository license file and the remaining artifact/release gates must be completed before a public release; track them in the [release checklist](docs/release-checklist.md).
+SmartORM is licensed under the [Apache License 2.0](LICENSE). No release, tag, Maven Central publication, or GitHub Release is implied by the current local preflight.

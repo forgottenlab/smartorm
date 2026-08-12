@@ -1,14 +1,14 @@
 # Architecture
 
-[English](architecture.md) | [简体中文](architecture.zh-CN.md)
+[English](architecture.md) · [简体中文](architecture.zh-CN.md)
 
-This document separates the current 2.0.x implementation from future architecture. Planned modules and Starter types are not available today.
+> **Summary:** SmartORM 2.0.x uses a single-module, layered runtime. This document separates that implemented shape from future architecture; planned modules and Starter types are not available today.
 
-## Current scope
+## 🧭 Current Scope
 
-SmartORM is one Maven `jar` artifact containing library code, Spring integration, demo application/configuration, MPJ integration, MySQL driver/resources, and tests. The public entry point is source/local-module integration; there is no AutoConfiguration or physical child module.
+SmartORM remains one Maven module whose source tree contains library code, Spring integration, the demo application/configuration, MPJ integration, MySQL support/resources, and tests. The 2.0.x release build produces an ordinary library main JAR plus sources and Javadoc JARs. Demo classes, `application.yaml`, and demo SQL are excluded from release artifacts while remaining available in the repository source tree. There is no AutoConfiguration or physical child module.
 
-## Runtime pipeline
+## 🔄 Runtime Pipeline
 
 ```text
 Annotated Mapper method
@@ -22,7 +22,7 @@ Annotated Mapper method
 
 Lifecycle hooks on `SmartMapper` are called around the Aspect path: `beforeSmartOperation`, `afterSmartOperation`, and `onSmartException`.
 
-## Main packages
+## 📦 Main Packages
 
 | Package | Current responsibility |
 |---|---|
@@ -37,11 +37,11 @@ Lifecycle hooks on `SmartMapper` are called around the Aspect path: `beforeSmart
 | `support`, `util` | JOIN inference, mapping, metadata, expressions, and helpers |
 | `demo` | Embedded application, entities, Mappers, and MyBatis configuration |
 
-## Non-JOIN query path
+## 🔎 Non-JOIN Query Path
 
 `@SmartSelect` and `@SmartPage` without JOIN metadata build MyBatis-Plus `QueryWrapper` instances and execute through `SmartMapperExecutor`. Return inference supports entity lists, Map lists, DTO lists, and single-object AUTO behavior. Pagination uses MyBatis-Plus `Page` and requires the pagination interceptor.
 
-## JOIN and native query path
+## 🔗 JOIN and Native Query Path
 
 A query with `@SmartJoin` renders SQL and an ordered compact parameter list, then executes through `SmartNativeMapper` and `SmartNativeExecutor`.
 
@@ -50,29 +50,31 @@ A query with `@SmartJoin` renders SQL and an ordered compact parameter list, the
 - The current repository does not wire `JdbcMetaProvider`, so convention inference is the proven default.
 - Native/JOIN results support Map and DTO paths; native `ENTITY_LIST` is rejected.
 
-## Mutation path
+## ✍️ Mutation Path
 
 Insert resolves fields/values into an entity and delegates to MyBatis-Plus insert. Update and delete build Wrappers and execute through `SmartMapperExecutor`.
 
 Before update/delete execution, `SmartMutationSafetyGuard` inspects final predicate segments. A missing effective predicate is rejected unless the method explicitly declares `allowFullTable = true`.
 
-## Current integration requirements
+## 🔧 Current Integration Requirements
 
 Spring component scanning must include `io.github.forgottenlab.smartorm`, and Mapper scanning must include both application Mappers and `io.github.forgottenlab.smartorm.mapper`. The demo achieves this with `scanBasePackages` and `@MapperScan`.
 
 There is no consumer-oriented Starter, configuration metadata, failure analyzer, startup validator, or Doctor in 2.0.x.
 
-## Current dependency and API boundaries
+## 🧩 Current Dependency and API Boundaries
 
 - `SmartMapper<T>` publicly extends both `BaseMapper<T>` and `MPJBaseMapper<T>`.
-- MySQL and Spring Web dependencies are currently part of the single artifact rather than isolated demo dependencies.
-- Demo code and runtime integration live beside core semantics.
+- MyBatis-Plus-Join remains a transitive dependency because `SmartMapper` exposes `MPJBaseMapper`.
+- JSqlParser is optional; Spring Web and MySQL Connector/J are runtime-optional rather than mandatory transitive consumer dependencies.
+- Demo code and runtime integration still live beside core semantics in the source module, although demo classes/configuration/SQL are excluded from release artifacts.
+- The locally installed artifact has passed a two-test external consumer smoke, including an offline rerun; Maven Central consumption remains unverified.
 - `SmartQuery` is public but inactive.
 - Wrapper and native paths do not share identical scalar-binding implementation.
 
 These are compatibility constraints, not hidden implementation details.
 
-## Future direction — planned only
+## 🗺️ Future Direction — Planned Only
 
 The roadmap proposes:
 
