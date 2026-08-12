@@ -39,6 +39,15 @@ jobs:
           -Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest
           test
 
+      - name: Run Starter auto-configuration tests
+        run: >-
+          mvn -B
+          -pl smartorm-spring-boot-starter
+          -am
+          -Dtest=SmartOrmAutoConfigurationTest
+          -Dsurefire.failIfNoSpecifiedTests=false
+          test
+
       - name: Validate MySQL Compose configuration
         run: docker compose -p smartorm-ci -f docker-compose.test.yml config --quiet
 

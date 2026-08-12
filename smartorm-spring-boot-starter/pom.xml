@@ -18,4 +18,33 @@
     <name>SmartORM Spring Boot Starter</name>
     <description>Spring Boot auto-configuration foundation for SmartORM</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>io.github.forgottenlab</groupId>
+            <artifactId>smartorm</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/..</directory>
+                <targetPath>META-INF</targetPath>
+                <includes>
+                    <include>LICENSE</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+
 </project>
