@@ -20,6 +20,6 @@ public class BaseMeta {
     /** 方法返回类型 */
     public Class<?> returnType;
 
-    /** SmartMapper<T> 中的实体类型 */
+    /** SmartMapper&lt;T&gt; 中的实体类型 */
     public Class<?> entityClass;
 }
