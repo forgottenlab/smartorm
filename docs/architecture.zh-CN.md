@@ -72,13 +72,13 @@ Insert 会把 fields/values 解析为实体并委托 MyBatis-Plus insert。Updat
 AutoConfiguration.imports
   -> SmartOrmAutoConfiguration
   -> BeanFactoryPostProcessor registrar
-  -> 恰好一个应用自有 SmartNativeMapper
+  -> 复用或精确注册 canonical smartNativeMapper
   -> SmartNativeExecutor + 五个 handler + registry + aspect
 ```
 
-Starter 不扫描 SmartORM component 或 Mapper package。应用必须用已有 MyBatis 注册机制提供且只提供一个 `SmartNativeMapper`，通常是在已有 `@MapperScan` 中加入 `io.github.forgottenlab.smartorm.mapper`。Registrar 在 MyBatis registry post-processor 之后观察 BeanDefinition，避免过早的 `@ConditionalOnBean` 在 `@MapperScan` 注册 Mapper 之前错误 backoff。没有声明硬编码的自动配置 `before`/`after` 顺序。
+Starter 不扫描 SmartORM component 或应用 Mapper package。应用只扫描自己的 Mapper，或继续使用 MyBatis Boot 默认发现。MyBatis registry post-processor 完成后，registrar 会复用一个兼容 `SmartNativeMapper`，否则精确注册一个 canonical `MapperFactoryBean`，因此不会抑制应用 scanner 的决策。没有声明硬编码的自动配置 `before`/`after` 顺序。
 
-激活刻意采用保守策略。`SmartNativeMapper` 缺失或不唯一、已存在 `SmartAnnotationAspect`，或标准运行时 Bean 名称冲突时，完整 SmartORM Bean 图会 back off。Starter 不注册 Mapper 或 scanner，也不创建 `DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理器、分页拦截器或 `JdbcMetaProvider`；bootstrap 不连接数据库。
+激活刻意采用保守策略。Starter 优先使用唯一或唯一 `@Primary` 的应用 `SqlSessionTemplate`，其次使用唯一或唯一 `@Primary` 的 `SqlSessionFactory`；session 缺失/歧义、内部 Mapper 注册不兼容、已存在 `SmartAnnotationAspect` 或运行时 Bean 名称冲突时，完整 Bean 图会 back off。Starter 只注册已知内部 Mapper，不注册 scanner，也不创建 `DataSource`、session 基础设施、事务管理器、分页拦截器或 `JdbcMetaProvider`；bootstrap 不连接数据库。
 
 配置属性/元数据、声明校验、FailureAnalyzer、启动 Validator 与 Doctor 尚未实现。
 

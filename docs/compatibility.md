@@ -14,7 +14,7 @@
 |---|---|---|
 | Java | release 17; local JDK 17.0.12 | Main/test compilation and focused tests passed |
 | Maven | local 3.9.11; no Wrapper | `test-compile`, focused tests, and package lifecycle passed |
-| Spring Boot | 3.5.5 | Core application context/database suites passed; Starter `ApplicationContextRunner` tests passed 8/8 without a database |
+| Spring Boot | 3.5.5 | Core application context/database suites passed; Starter `ApplicationContextRunner` tests passed 21/21 without a database |
 | MyBatis-Plus | 3.5.14 | Wrapper CRUD/page behavior passed current suites |
 | MyBatis-Plus-Join | 1.5.5 | Current combined-artifact JOIN tests passed |
 | MySQL Connector/J | 9.4.0 | Used in the current and retained disposable integration runs |
@@ -22,9 +22,9 @@
 | Core artifact set | main/sources/Javadoc/POM | Reactor package and artifact inspection passed after separate test validation |
 | Starter artifact | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` | Ordinary JAR, imports metadata, dependencies, and contents inspected locally |
 | Core external consumer | isolated local Maven repository | Two tests passed online and passed again offline |
-| Starter external consumer | Boot 3.5.5, isolated local Maven repository | Real `@EnableAutoConfiguration` plus application-owned `@MapperScan` passed 1/1 online and 1/1 offline without a database connection |
+| Starter external consumer | Boot 3.5.5, isolated local Maven repository | Real `@EnableAutoConfiguration` plus default application Mapper discovery passed 1/1 online and 1/1 offline without a database connection or internal-package reference |
 
-An additional fixed-seed randomized class/method-order run passed all 46 database tests on 2026-07-20. In the 2026-08-12 release preflight, a new `smartorm-release-preflight` environment passed 46/46 and cleanup left zero project containers, networks, and volumes. GitHub Actions run `31574822720` then verified exact main SHA `c6e8c8b`: remote 28/28, MySQL 46/46, package, report upload, and cleanup all passed. The later Starter feature checkpoint has only local evidence and has not been pushed or remotely verified.
+An additional fixed-seed randomized class/method-order run passed all 46 database tests on 2026-07-20. In the 2026-08-12 release preflight, a new `smartorm-release-preflight` environment passed 46/46 and cleanup left zero project containers, networks, and volumes. GitHub Actions run `31574822720` then verified exact main SHA `c6e8c8b`: remote 28/28, MySQL 46/46, package, report upload, and cleanup all passed. The pre-hardening Starter feature checkpoint was pushed at `b90b4c3`, but current hardening commits have only local evidence and were not pushed in this task.
 
 ## 🚫 Not Verified
 
@@ -47,8 +47,8 @@ Do not infer support from compilation alone.
 - Core release artifacts exclude demo classes, `application.yaml`, and demo SQL; the demo remains available in the core source tree.
 - `SmartMapper` exposes `MPJBaseMapper` in its public superinterfaces.
 - MyBatis-Plus-Join remains transitive. JSqlParser is optional; Spring Web and MySQL Connector/J are runtime-optional.
-- Direct core use requires explicit component and Mapper scanning. Starter use removes SmartORM component scanning but still requires the application to register exactly one `SmartNativeMapper` through its existing MyBatis configuration.
-- The Starter does not own Mapper scanning, `DataSource`, `SqlSessionFactory`, `SqlSessionTemplate`, transaction management, or pagination, and it does not access the database during its own bootstrap.
+- Direct core use requires explicit component and internal Mapper scanning. Starter use requires neither: the Starter precisely registers its one internal Mapper while applications scan only their own business Mapper packages.
+- The Starter does not own application Mapper scanning, `DataSource`, `SqlSessionFactory`, `SqlSessionTemplate`, transaction management, or pagination, and it does not access the database during its own bootstrap. Existing explicit/legacy Native Mapper registration is reused; missing or ambiguous session candidates back off conservatively.
 - No Maven Wrapper, configuration metadata, Validator, Doctor, FailureAnalyzer, or maintained in-repository consumer sample exists.
 - The local published-like artifact path has passed package/install/consumer checks, but no public repository path has been validated.
 

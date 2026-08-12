@@ -25,9 +25,9 @@ Start in a branch or local evaluation module. Do not change Mapper inheritance o
 - Run the existing application and test suite before and after adding the local module.
 - Record the current dependency surface: the parent reactor contains compatible core and combined Starter children; core artifacts exclude demo classes/configuration/SQL, MPJ remains transitive, and JSqlParser/Web/MySQL are optional as documented.
 
-Current limitation: the core and development Starter have isolated local-repository consumer evidence, including offline repeats, but neither is available from a verified Maven Central publication. The Starter feature checkpoint also lacks remote CI and real-project adoption evidence. This proves local dependency-only paths, not public installation availability.
+Current limitation: the core and development Starter have isolated local-repository consumer evidence, including offline repeats, but neither is available from a verified Maven Central publication. The pre-hardening Starter checkpoint `b90b4c3` is on the remote feature branch without feature-SHA CI evidence; the current hardening commits remain local, and real-project adoption is unverified. This proves local dependency-only paths, not public installation availability.
 
-For the local 2.1.x Starter path, use `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`; it removes SmartORM component scanning but still relies on the application's existing MyBatis registration for exactly one `SmartNativeMapper`. The direct core path remains available at `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT` and keeps explicit component registration.
+For the local 2.1.x Starter path, use `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`; it removes SmartORM component/internal-Mapper scanning and precisely registers its internal Mapper against unambiguous application session infrastructure. Applications continue scanning only their business Mappers. The direct core path remains available at `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT` and keeps explicit component/internal-Mapper registration.
 
 Rollback: remove the Starter and restore explicit core component registration if retaining SmartORM, or remove the SmartORM dependency and its scan configuration entirely.
 

@@ -30,8 +30,8 @@
 
 - 包含兼容 `smartorm` core 与合并式 `smartorm-spring-boot-starter` 的父 reactor；
 - 通过 `AutoConfiguration.imports` 发现，无需扫描 SmartORM component；
-- 复用恰好一个应用自有 `SmartNativeMapper`，Starter 不拥有 MyBatis/数据库/事务基础设施；
-- 8 个数据库无关自动配置测试，以及包含离线复跑的隔离外部 Spring Boot 使用方测试；
+- 延迟精确注册一个内部 `SmartNativeMapper`，应用继续拥有业务 Mapper 发现与 MyBatis/数据库/事务基础设施；
+- 21 个数据库无关自动配置测试，以及包含离线复跑和默认业务 Mapper 扫描的隔离外部 Spring Boot 使用方测试；
 - 拓扑变更后完整的 core 回归与可销毁 MySQL 检查。
 
 仍需通过单独获批任务完成：

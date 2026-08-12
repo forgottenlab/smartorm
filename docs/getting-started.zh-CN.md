@@ -36,7 +36,7 @@ Spring Boot 使用方可依赖本地安装的合并式 Starter：
 </dependency>
 ```
 
-Starter 通过 `AutoConfiguration.imports` 发现。它只在观察到恰好一个应用自有 `SmartNativeMapper` 后，注册 SmartORM executor、五个 handler、registry 与 aspect。
+Starter 通过 `AutoConfiguration.imports` 发现。应用 Mapper scanner 决策完成后，它会基于无歧义的应用 session 基础设施精确注册内部 `SmartNativeMapper`，再注册 executor、五个 handler、registry 与 aspect。
 
 ### 直接 Core 路径
 
@@ -56,23 +56,20 @@ MyBatis-Plus-Join 保持传递依赖。JSqlParser 为 optional；Spring Web 与 
 
 ## 🔧 注册 Mapper 边界
 
-使用 Starter 时，component scan 保持由应用所有，并在应用已有 MyBatis 扫描中加入 SmartORM Native Mapper：
+使用 Starter 时，Mapper 扫描继续由应用所有，只扫描应用自己的业务 package（或使用 MyBatis Boot 默认发现）：
 
 ```java
 @SpringBootApplication
-@MapperScan({
-        "com.example.app.mapper",
-        "io.github.forgottenlab.smartorm.mapper"
-})
+@MapperScan("com.example.app.mapper")
 public class ExampleApplication {
 }
 ```
 
-这是应用已有的 MyBatis 注册，不是 SmartORM 所有的第二套 scanner。必须恰好注册一个 `SmartNativeMapper`。Starter 不创建 Mapper scanner、`DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理器或分页拦截器，自身 bootstrap 也不访问数据库。
+Starter 只注册已知内部 Mapper；不会扫描应用 package，也不创建 Mapper scanner、`DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理器或分页拦截器，自身 bootstrap 也不访问数据库。已有显式/旧式内部 Mapper 注册会被复用而不重复。
 
-Native Mapper 缺失或有歧义，或运行时 Bean 图与应用 Bean 冲突时，当前 Starter 会在没有 Validator 或 FailureAnalyzer 的情况下 back off。如果使用 `@SmartPage`，请按应用原有方式注册 MyBatis-Plus 分页拦截器。
+标准场景使用唯一或唯一 `@Primary` 的应用 `SqlSessionTemplate`，其次使用 `SqlSessionFactory`；session 候选缺失/歧义或运行时 Bean 图冲突时，当前 Starter 会在没有 Validator 或 FailureAnalyzer 的情况下 back off。如果使用 `@SmartPage`，请按应用原有方式注册 MyBatis-Plus 分页拦截器。
 
-仅在直接 core 路径中，还需把 `io.github.forgottenlab.smartorm` 加入 Spring component scan。Mapper 扫描与上述配置相同。
+仅在直接 core 路径中，还需把 `io.github.forgottenlab.smartorm` 加入 Spring component scan，并把 `io.github.forgottenlab.smartorm.mapper` 加入 Mapper 扫描。Starter 不需要这项手动内部 package 配置。
 
 ## 🧱 定义实体
 
@@ -147,11 +144,11 @@ class UserMapperTest {
 
 ### Smart Handler 或 Aspect 未生效
 
-使用 Starter 时，确认应用恰好注册一个 `SmartNativeMapper`，且没有冲突的 SmartORM 运行时 Bean 名称或已存在的 `SmartAnnotationAspect`。使用直接 core 路径时，还需确认 component scan 包含 `io.github.forgottenlab.smartorm`。
+使用 Starter 时，确认应用有一个无歧义的 session 候选，且没有冲突的 SmartORM 运行时 Bean 名称或已存在的 `SmartAnnotationAspect`。使用直接 core 路径时，还需确认 SmartORM component 与内部 Mapper package 已被扫描。
 
 ### `SmartNativeMapper` 未注册
 
-JOIN 查询会使用 Native 执行路径。请在应用已有 `@MapperScan` 中加入 `io.github.forgottenlab.smartorm.mapper`；Starter 不会自动扫描。
+JOIN 查询会使用 Native 执行路径。使用 Starter 时不要把 SmartORM 内部 package 加入 `@MapperScan`；应检查 session 歧义和冲突的旧注册。只有直接 core 路径需要手动扫描内部 Mapper。
 
 ### 没有诊断说明 Starter 为何 back off
 

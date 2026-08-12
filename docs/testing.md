@@ -48,9 +48,9 @@ The integration environment is defined by `docker-compose.test.yml`:
 
 ### ☁️ CI Verification
 
-The current `.github/workflows/test.yml` selects JDK 17, enables Maven dependency caching, compiles tests, runs the 28 database-independent core tests and eight Starter context tests, starts the Compose MySQL service, runs the exact 46 database tests, packages without rerunning tests, uploads Surefire reports, and defines an `if: always()` cleanup step.
+The current `.github/workflows/test.yml` selects JDK 17, enables Maven dependency caching, compiles tests, runs the 28 database-independent core tests and 21 Starter context tests, starts the Compose MySQL service, runs the exact 46 database tests, packages without rerunning tests, uploads Surefire reports, and defines an `if: always()` cleanup step.
 
-The exact `push/main` run for Foundation SHA `c6e8c8b` was inspected read-only as run `31574822720`. It passed the 28 database-independent tests, 46 MySQL tests, package, Surefire upload, and always-cleanup steps. That run predates the Starter feature commits; the current feature checkpoint requires its own remote run after an explicitly authorized push. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
+The exact `push/main` run for Foundation SHA `c6e8c8b` was inspected read-only as run `31574822720`. It passed the 28 database-independent tests, 46 MySQL tests, package, Surefire upload, and always-cleanup steps. The pre-hardening Starter checkpoint `b90b4c3` is present on the remote feature branch but produced no feature-SHA workflow run; the current hardening commits remain local and require separate remote evidence after an explicitly authorized push. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
 
 ### 🧩 Starter Tests
 
@@ -60,9 +60,9 @@ The focused auto-configuration suite is database-independent:
 mvn -o -pl smartorm-spring-boot-starter -am '-Dtest=SmartOrmAutoConfigurationTest' '-Dsurefire.failIfNoSpecifiedTests=false' test
 ```
 
-The current suite passes 8/8 and covers imports discovery, the exact eight-bean runtime graph, application-owned `@MapperScan`, missing-class and missing-Mapper backoff, user-bean backoff, infrastructure non-ownership, and no Mapper interactions during bootstrap.
+The current suite passes 21/21 and covers imports discovery, exact internal Mapper metadata, the eight-bean runtime graph, MyBatis Boot default discovery, application-only `@MapperScan`, explicit/legacy compatibility, unique/primary/ambiguous sessions, missing-class/infrastructure and user-bean backoff, infrastructure non-ownership, and zero database interaction during bootstrap.
 
-An external Boot 3.5.5 consumer was generated under ignored `target/` state and resolved only the locally installed `smartorm-spring-boot-starter:2.1.0-SNAPSHOT`. Its single `@SpringBootTest` passed once after the required Surefire provider was obtained from the project's existing configured repository, then passed again offline. It used application-owned `@MapperScan` and a synthetic `SqlSessionFactory`; it did not connect to a database and is not a maintained sample project.
+An external Boot 3.5.5 consumer was generated under ignored `target/` state and resolved only the locally installed `smartorm-spring-boot-starter:2.1.0-SNAPSHOT`. Its single context test passed online and then offline. It used MyBatis Boot default discovery for its own Mapper, contained no SmartORM internal-package reference or manual Native Mapper definition, and verified zero database connections; it is not a maintained sample project.
 
 ## ✅ Requirements
 
@@ -114,7 +114,7 @@ The first row is current-preflight evidence. The three 2026-07-20 rows are retai
 
 ## 📦 Artifact Preflight
 
-After test compilation, the 28 core regressions, and the eight Starter tests passed separately, the current reactor completed an offline package with tests intentionally skipped:
+After test compilation, the 28 core regressions, and the 21 Starter tests passed separately, the current reactor completed an offline package with tests intentionally skipped:
 
 ```powershell
 mvn -o -DskipTests package

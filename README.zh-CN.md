@@ -34,7 +34,7 @@ SmartORM 是一个面向 Spring Boot 与 MyBatis-Plus 的可渐进接入、注�
 | 固定 JOIN 声明 | ✅ 可用 | `@SmartJoin` 支持显式或约定推断 `ON`；当前实现基于 MPJ |
 | 写操作安全 | ✅ 可用 | 默认阻止没有有效 `WHERE` 的 Smart 更新与删除 |
 | 生命周期 Hook | ✅ 可用 | `beforeSmartOperation`、`afterSmartOperation`、`onSmartException` |
-| Spring Boot Starter | 🧪 开发中 | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` 已完成本地验证；它复用应用自有的 MyBatis 基础设施与 Mapper 扫描 |
+| Spring Boot Starter | 🧪 开发中 | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` 已在本地验证精确注册一个内部 Mapper，同时保留应用对 MyBatis 基础设施和业务 Mapper 扫描的所有权 |
 
 `@SmartQuery` 当前只是未启用的预留注解，不是受支持的执行入口。
 
@@ -99,7 +99,7 @@ mvn -DskipTests install
 </dependency>
 ```
 
-Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再对 SmartORM 运行组件执行 component scan。应用仍必须注册且只注册一个 `SmartNativeMapper`，通常是把 `io.github.forgottenlab.smartorm.mapper` 加入已有 MyBatis Mapper 扫描。Starter 复用应用的 `DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理器与 Mapper 注册，不创建这些基础设施。
+Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再对 SmartORM 运行组件执行 component scan。Starter 会精确注册内部 `SmartNativeMapper`；应用只扫描自己的 Mapper package，或继续使用 MyBatis Boot 默认发现。Starter 复用无歧义的应用 `SqlSessionTemplate` 或 `SqlSessionFactory`，不会创建 `DataSource`、session 基础设施、事务管理器或全局 Mapper scanner。已有显式/旧式 Native Mapper 注册会被复用以便迁移；session 缺失或歧义时保守 back off。
 
 依赖 `-DskipTests` 前应先单独完成测试门禁；上面的命令只负责安装已经验证的本地构建。如果应用明确继续使用手动集成路径，也可依赖 `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`。Core artifact 仍是普通库 JAR，并已排除 demo class、`application.yaml` 与 demo SQL。由于 `SmartMapper` 暴露 MPJ，MyBatis-Plus-Join 仍保持传递依赖；JSqlParser、Spring Web 与 MySQL Connector/J 的边界见[兼容性](docs/compatibility.zh-CN.md)。
 
@@ -115,11 +115,12 @@ Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再�
 | 层级 | 范围 | 证据 |
 |---|---|---|
 | 数据库无关回归 | Native SQL 渲染/绑定与写操作安全 | 本轮 preflight：28/28 通过 |
-| Starter 上下文回归 | 自动配置、backoff、发现、应用自有 Mapper 扫描 | 当前开发版 preflight：无数据库 8/8 通过 |
-| 外部 Starter 使用方 | 隔离本地 Maven 仓库、真实 `@EnableAutoConfiguration` 与应用自有 `@MapperScan` | 联网 1/1 通过，随后离线 1/1 通过 |
+| Starter 上下文回归 | 内部 Mapper 注册、默认/显式应用扫描、兼容、session 选择与 backoff | 本轮 hardening：无数据库 21/21 通过 |
+| 外部 Starter 使用方 | 隔离本地 Maven 仓库、真实 `@EnableAutoConfiguration`、默认业务 Mapper 发现、无内部 package 引用 | 联网 1/1 通过，随后离线 1/1 通过 |
 | 历史 MySQL 双轮 | 两个独立创建的 `mysql:9.4.0` volume | 2026-07-20：两轮各 46/46，随后清理 |
 | 历史随机顺序探针 | 固定 seed `20260720` | 2026-07-20：46/46，随后清理 |
 | 本轮 MySQL release preflight | 全新 `smartorm-release-preflight` Compose 项目 | 2026-08-12：46/46；0 failures/errors/skips；container/network/volume 残留 0/0/0 |
+| Starter hardening MySQL 回归 | 全新 `smartorm-starter-mapper-hardening` Compose 项目 | 2026-08-13：46/46；cleanup 残留 0/0/0 |
 | GitHub Actions | JDK 17、28 测试、MySQL 套件、package、报告与 cleanup | Foundation SHA `c6e8c8b`：精确 `push/main` run `31574822720` 通过全部门禁；Starter feature CI 待执行 |
 
 本地 preflight 还包含编译、package 与 artifact 检查。各层证据证明的边界不同，历史运行不会被当成本轮结果。详见[测试](docs/testing.zh-CN.md)。

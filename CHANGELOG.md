@@ -12,8 +12,8 @@
 - 仓库级 Apache License 2.0 `LICENSE` 文件。
 - 普通库主 JAR、sources JAR、Javadoc JAR 与类发布 POM 的本地构建/检查链路，以及隔离本地仓库的外部使用方 smoke test。
 - `smartorm-parent`、兼容 `smartorm` core 与合并式 `smartorm-spring-boot-starter` 的 `2.1.0-SNAPSHOT` Maven reactor。
-- 通过 `AutoConfiguration.imports` 发现的 `SmartOrmAutoConfiguration`，以及在应用自有 Mapper 注册之后组建最小 SmartORM 运行图的 package-private registrar。
-- 8 个数据库无关 Starter 上下文测试，以及使用隔离本地 Maven 仓库的外部 Spring Boot 使用方 1 个 smoke test 与离线复跑。
+- 通过 `AutoConfiguration.imports` 发现的 `SmartOrmAutoConfiguration`，以及在应用 Mapper scanner 完成后精确注册内部 `SmartNativeMapper` 并组建最小 SmartORM 运行图的 package-private registrar。
+- 21 个数据库无关 Starter 上下文测试，以及使用隔离本地 Maven 仓库、默认业务 Mapper 发现的外部 Spring Boot 使用方 1 个 smoke test 与离线复跑。
 
 ### Changed
 - `SmartUpdate` / `SmartDelete` 现在基于最终结构化 WHERE 谓词默认拒绝无条件全表操作；此前依赖空 WHERE 的调用需要显式设置 `allowFullTable = true`。
@@ -23,7 +23,7 @@
 - 数据库测试改为显式激活隔离 `test` profile，并强化确定性 fixture、行数、分页、异常和 JOIN 断言。
 - 原根 `src` 机械迁入 `smartorm` 子模块，文件内容哈希、现有 artifactId、Java package 与公开 API 保持不变。
 - Core 发布 artifacts 排除 demo class、`application.yaml` 与 demo SQL；demo 源码仍保留在 `smartorm` 子模块中。
-- Starter 复用应用已有且恰好一个 `SmartNativeMapper`，不扫描 Mapper，不创建数据库/事务基础设施；缺失、歧义或 Bean 冲突时整个运行图保守 back off。
+- Starter 复用已有兼容 `SmartNativeMapper`，否则用无歧义的应用 session 精确注册一个 canonical Mapper；不扫描 package、不创建数据库/事务基础设施，session 歧义或 Bean 冲突时整个运行图保守 back off。
 - JSqlParser 改为 optional，Spring Web 与 MySQL Connector/J 改为 runtime + optional；由于公开 Mapper 类型边界，MyBatis-Plus-Join 保持传递依赖。
 - Maven package 生成普通库 JAR，并附加 sources/Javadoc artifacts；这不代表 Maven Central 已发布。
 
@@ -32,7 +32,7 @@
 - 修复显式 JOIN `ON` 被整体当作标量参数的问题；结构保留为受控 SQL 谓词，其中运行时标量继续绑定。
 
 ### Notes
-- `2.1.0-SNAPSHOT` Starter 只是已本地验证的开发 foundation；尚未在 Maven Central 发布，其 feature checkpoint 也尚未远程验证。
+- `2.1.0-SNAPSHOT` Starter 只是已本地验证的开发 foundation，尚未在 Maven Central 发布；hardening 前的 `b90b4c3` 已在远程 feature branch，但本轮 hardening commits 尚未 push 或取得远程 CI 证据。
 - 本轮没有实现配置属性/元数据、Validator、Doctor、FailureAnalyzer 或 3.0 语义模块拆分。
 
 ## [2.0.0] - 2026-04-22

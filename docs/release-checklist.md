@@ -48,7 +48,7 @@
 | Ordinary main JAR plus sources/Javadoc/POM | 🧪 Locally Verified | Package and archive inspection pass without ignored Javadoc errors |
 | Demo classes/configuration/SQL excluded from artifacts | 🧪 Locally Verified | Repository demo source remains available |
 | Isolated local install and consumer smoke | 🧪 Locally Verified | Two consumer tests, including an offline repeat |
-| 2.1.x development Starter artifact and consumer | 🧪 Locally Verified | Ordinary Starter JAR; 8/8 context tests; external consumer 1/1 plus offline repeat |
+| 2.1.x development Starter artifact and consumer | 🧪 Locally Verified | Ordinary Starter JAR; 21/21 context tests; default-scanning external consumer 1/1 plus offline repeat |
 | Javadoc warning policy | ⏳ Pending | Generation passes; documentation-quality warnings require an owner threshold |
 | Source author-email attribution decision | ⏳ Pending | Existing attribution is not a secret, but publication policy needs owner acceptance |
 | Bit-for-bit reproducibility expectation | ⏳ Pending | ZIP timestamps are not normalized; no reproducibility claim |

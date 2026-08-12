@@ -72,13 +72,13 @@ The 2.1.x development Starter uses this activation path:
 AutoConfiguration.imports
   -> SmartOrmAutoConfiguration
   -> BeanFactoryPostProcessor registrar
-  -> exactly one existing application-owned SmartNativeMapper
+  -> reuse or precisely register canonical smartNativeMapper
   -> SmartNativeExecutor + five handlers + registry + aspect
 ```
 
-The Starter does not component-scan SmartORM or Mapper packages. The application must use its existing MyBatis registration to provide exactly one `SmartNativeMapper`, normally by including `io.github.forgottenlab.smartorm.mapper` in its existing `@MapperScan`. The registrar observes definitions after MyBatis registry post-processors, which avoids an early `@ConditionalOnBean` decision before `@MapperScan` has registered the Mapper. No hard auto-configuration `before`/`after` ordering is declared.
+The Starter does not component-scan SmartORM or application Mapper packages. Applications scan only their own Mappers or keep MyBatis Boot's default discovery. After MyBatis registry post-processors complete, the registrar reuses one compatible `SmartNativeMapper` or registers exactly one canonical `MapperFactoryBean`, so it cannot suppress the application's scanner decision. No hard auto-configuration `before`/`after` ordering is declared.
 
-Activation is deliberately conservative. A missing or non-unique `SmartNativeMapper`, an existing `SmartAnnotationAspect`, or a conflicting standard runtime bean name causes the complete SmartORM graph to back off. The Starter never registers a Mapper or scanner and never creates a `DataSource`, `SqlSessionFactory`, `SqlSessionTemplate`, transaction manager, pagination interceptor, or `JdbcMetaProvider`; bootstrap does not connect to a database.
+Activation is deliberately conservative. The Starter prefers one unique or uniquely primary application `SqlSessionTemplate`, then one unique or uniquely primary `SqlSessionFactory`; missing/ambiguous session infrastructure, an incompatible internal Mapper registration, an existing `SmartAnnotationAspect`, or a conflicting runtime bean name causes the complete graph to back off. The Starter registers only its known internal Mapper, never a scanner, and never creates a `DataSource`, session infrastructure, transaction manager, pagination interceptor, or `JdbcMetaProvider`; bootstrap does not connect to a database.
 
 Configuration properties/metadata, declaration validation, a failure analyzer, a startup validator, and a Doctor are not implemented.
 

@@ -14,7 +14,7 @@
 |---|---|---|
 | Java | release 17；本地 JDK 17.0.12 | 主源码/测试编译和聚焦测试通过 |
 | Maven | 本地 3.9.11；无 Wrapper | `test-compile`、聚焦测试与 package 生命周期通过 |
-| Spring Boot | 3.5.5 | Core Application Context/数据库套件通过；Starter `ApplicationContextRunner` 无数据库测试 8/8 通过 |
+| Spring Boot | 3.5.5 | Core Application Context/数据库套件通过；Starter `ApplicationContextRunner` 无数据库测试 21/21 通过 |
 | MyBatis-Plus | 3.5.14 | 当前套件验证 Wrapper CRUD/page 行为 |
 | MyBatis-Plus-Join | 1.5.5 | 当前合并 artifact 的 JOIN 测试通过 |
 | MySQL Connector/J | 9.4.0 | 本轮与保留的可销毁集成测试均实际使用 |
@@ -22,9 +22,9 @@
 | Core artifact 集 | main/sources/Javadoc/POM | 独立测试验证后，reactor package 与 artifact 检查通过 |
 | Starter artifact | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` | 普通 JAR、imports metadata、依赖与内容已在本地检查 |
 | Core 外部使用方 | 隔离本地 Maven 仓库 | 2 个测试联网通过并再次离线复跑通过 |
-| Starter 外部使用方 | Boot 3.5.5，隔离本地 Maven 仓库 | 真实 `@EnableAutoConfiguration` 与应用自有 `@MapperScan` 在无数据库连接下联网 1/1、离线 1/1 通过 |
+| Starter 外部使用方 | Boot 3.5.5，隔离本地 Maven 仓库 | 真实 `@EnableAutoConfiguration` 与默认应用 Mapper 发现，在无数据库连接和内部 package 引用下联网 1/1、离线 1/1 通过 |
 
-额外固定 seed 的随机类/方法顺序运行也在 2026-07-20 通过全部 46 个数据库测试。2026-08-12 release preflight 中，全新 `smartorm-release-preflight` 环境通过 46/46，清理后项目 container、network 与 volume 均为 0。随后 GitHub Actions run `31574822720` 验证了准确 main SHA `c6e8c8b`：远程 28/28、MySQL 46/46、package、报告上传与 cleanup 全部通过。之后的 Starter feature checkpoint 只有本地证据，尚未 push 或远程验证。
+额外固定 seed 的随机类/方法顺序运行也在 2026-07-20 通过全部 46 个数据库测试。2026-08-12 release preflight 中，全新 `smartorm-release-preflight` 环境通过 46/46，清理后项目 container、network 与 volume 均为 0。随后 GitHub Actions run `31574822720` 验证了准确 main SHA `c6e8c8b`：远程 28/28、MySQL 46/46、package、报告上传与 cleanup 全部通过。hardening 前的 Starter feature checkpoint 已 push 至 `b90b4c3`；本轮 hardening commits 只有本地证据，未 push。
 
 ## 🚫 未验证
 
@@ -47,8 +47,8 @@
 - Core 发布 artifacts 排除 demo class、`application.yaml` 与 demo SQL；demo 仍保留在 core 源码树中。
 - `SmartMapper` 的公开父接口包含 `MPJBaseMapper`。
 - MyBatis-Plus-Join 保持传递依赖。JSqlParser 为 optional；Spring Web 与 MySQL Connector/J 为 runtime + optional。
-- 直接 core 路径需要显式 component 与 Mapper 扫描。Starter 路径不再扫描 SmartORM component，但仍要求应用通过已有 MyBatis 配置注册恰好一个 `SmartNativeMapper`。
-- Starter 不拥有 Mapper 扫描、`DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理或分页，且自身 bootstrap 不访问数据库。
+- 直接 core 路径需要显式 component 与内部 Mapper 扫描；Starter 路径两者都不需要，Starter 会精确注册一个内部 Mapper，应用只扫描自己的业务 Mapper package。
+- Starter 不拥有应用 Mapper 扫描、`DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理或分页，且自身 bootstrap 不访问数据库。已有显式/旧式 Native Mapper 注册会被复用；session 候选缺失或歧义时保守 back off。
 - 不存在 Maven Wrapper、配置元数据、Validator、Doctor、FailureAnalyzer 或仓库内维护的使用方 sample。
 - 本地类发布 artifact 路径已通过 package/install/consumer 检查，但公共仓库路径尚未验证。
 

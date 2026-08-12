@@ -48,9 +48,9 @@ mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererT
 
 ### ☁️ CI 验证
 
-当前 `.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 28 个数据库无关 core 测试与 8 个 Starter 上下文测试，启动 Compose MySQL，运行准确的 46 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
+当前 `.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 28 个数据库无关 core 测试与 21 个 Starter 上下文测试，启动 Compose MySQL，运行准确的 46 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
 
-Foundation SHA `c6e8c8b` 的精确 `push/main` 运行已通过只读方式核验为 run `31574822720`。它通过了 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。该运行早于 Starter feature commits；当前 feature checkpoint 需在获得明确 push 授权后单独进行远程运行。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
+Foundation SHA `c6e8c8b` 的精确 `push/main` 运行已通过只读方式核验为 run `31574822720`。它通过了 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。hardening 前的 Starter checkpoint `b90b4c3` 已存在于远程 feature branch，但没有产生该 feature SHA 的 workflow run；本轮 hardening commits 仍只在本地，需在获得明确 push 授权后另行取得远程证据。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
 
 ### 🧩 Starter 测试
 
@@ -60,9 +60,9 @@ Foundation SHA `c6e8c8b` 的精确 `push/main` 运行已通过只读方式核验
 mvn -o -pl smartorm-spring-boot-starter -am '-Dtest=SmartOrmAutoConfigurationTest' '-Dsurefire.failIfNoSpecifiedTests=false' test
 ```
 
-当前套件 8/8 通过，覆盖 imports 发现、精确 8 Bean 运行图、应用自有 `@MapperScan`、缺类/缺 Mapper backoff、用户 Bean backoff、基础设施非所有权，以及 bootstrap 时无 Mapper 交互。
+当前套件 21/21 通过，覆盖 imports 发现、精确内部 Mapper metadata、8 Bean 运行图、MyBatis Boot 默认发现、仅应用 package 的 `@MapperScan`、显式/旧式兼容、唯一/primary/歧义 session、缺类/基础设施与用户 Bean backoff、基础设施非所有权，以及 bootstrap 时数据库零交互。
 
-一个 Boot 3.5.5 外部使用方在忽略的 `target/` 下生成，并且只解析本地安装的 `smartorm-spring-boot-starter:2.1.0-SNAPSHOT`。其单个 `@SpringBootTest` 在从项目已配置仓库获取所需 Surefire provider 后通过，随后离线复跑也通过。它使用应用自有 `@MapperScan` 与合成 `SqlSessionFactory`，没有连接数据库，也不是仓库维护的 sample project。
+一个 Boot 3.5.5 外部使用方在忽略的 `target/` 下生成，并且只解析本地安装的 `smartorm-spring-boot-starter:2.1.0-SNAPSHOT`。其单个上下文测试联网通过，随后离线复跑也通过。它使用 MyBatis Boot 默认发现扫描自己的 Mapper，不包含 SmartORM 内部 package 引用或手工 Native Mapper 定义，并验证数据库连接为零；它不是仓库维护的 sample project。
 
 ## ✅ 环境要求
 
@@ -114,7 +114,7 @@ docker compose -p smartorm-it-run1 -f docker-compose.test.yml down -v --remove-o
 
 ## 📦 Artifact Preflight
 
-测试编译、28 个 core 回归与 8 个 Starter 测试另行通过后，当前 reactor 以明确跳过测试的方式完成离线 package：
+测试编译、28 个 core 回归与 21 个 Starter 测试另行通过后，当前 reactor 以明确跳过测试的方式完成离线 package：
 
 ```powershell
 mvn -o -DskipTests package

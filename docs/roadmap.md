@@ -30,8 +30,8 @@ Locally implemented and verified in the current development line:
 
 - a parent reactor with compatible `smartorm` core and a combined `smartorm-spring-boot-starter`;
 - `AutoConfiguration.imports` discovery without SmartORM component scanning;
-- reuse of exactly one application-owned `SmartNativeMapper`, with no Starter-owned MyBatis/database/transaction infrastructure;
-- eight database-free auto-configuration tests and an isolated external Spring Boot consumer test, including an offline repeat;
+- late precise registration of one internal `SmartNativeMapper`, while application business Mapper discovery and MyBatis/database/transaction infrastructure remain application-owned;
+- 21 database-free auto-configuration tests and an isolated default-scanning Spring Boot consumer test, including an offline repeat;
 - full core regression and disposable MySQL checks after the topology change.
 
 Still gated by separately approved work:

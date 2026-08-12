@@ -34,7 +34,7 @@ It removes repetitive, fixed-shape Mapper code while preserving the MyBatis-Plus
 | Fixed JOIN declarations | ✅ Available | `@SmartJoin` supports explicit or convention-inferred `ON`; the current implementation is MPJ-based |
 | Mutation safety | ✅ Available | Smart update/delete operations without an effective `WHERE` are blocked by default |
 | Lifecycle hooks | ✅ Available | `beforeSmartOperation`, `afterSmartOperation`, and `onSmartException` |
-| Spring Boot Starter | 🧪 Development | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` is locally verified; it reuses application-owned MyBatis infrastructure and Mapper scanning |
+| Spring Boot Starter | 🧪 Development | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` locally registers its one internal Mapper while preserving application-owned MyBatis infrastructure and business Mapper scanning |
 
 `@SmartQuery` is an inactive placeholder, not a supported execution entry point.
 
@@ -99,7 +99,7 @@ Then a local Spring Boot consumer can use the development Starter coordinates:
 </dependency>
 ```
 
-The Starter uses Spring Boot's `AutoConfiguration.imports` discovery and does not require application component scanning for SmartORM runtime components. The application must still register exactly one `SmartNativeMapper`, normally by including `io.github.forgottenlab.smartorm.mapper` in its existing MyBatis Mapper scan. It reuses the application's `DataSource`, `SqlSessionFactory`, `SqlSessionTemplate`, transaction manager, and Mapper registration; it creates none of them.
+The Starter uses Spring Boot's `AutoConfiguration.imports` discovery and does not require application component scanning for SmartORM runtime components. It precisely registers its internal `SmartNativeMapper`; applications scan only their own Mapper packages or keep MyBatis Boot's default discovery. The Starter reuses an unambiguous application `SqlSessionTemplate` or `SqlSessionFactory` and never creates a `DataSource`, session infrastructure, transaction manager, or global Mapper scanner. Existing explicit/legacy Native Mapper registration is reused for migration; missing or ambiguous session infrastructure backs off conservatively.
 
 Run the test gates separately before relying on `-DskipTests`; the command above only installs an already-validated local build. Applications that intentionally keep the manual integration path can depend on `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT` instead. The core artifact remains an ordinary library JAR. Demo classes, `application.yaml`, and demo SQL are excluded. MyBatis-Plus-Join remains transitive because it is exposed by `SmartMapper`; JSqlParser, Spring Web, and MySQL Connector/J retain the dependency boundaries documented in [Compatibility](docs/compatibility.md).
 
@@ -115,11 +115,12 @@ The opt-in bypasses only the missing-effective-`WHERE` refusal. It does not add 
 | Layer | Scope | Evidence |
 |---|---|---|
 | Database-independent regressions | Native SQL rendering/binding and mutation safety | Current preflight: 28/28 passed |
-| Starter context regressions | Auto-configuration, backoff, discovery, application-owned Mapper scan | Current development preflight: 8/8 passed without a database |
-| External Starter consumer | Isolated local Maven repository, real `@EnableAutoConfiguration` and application-owned `@MapperScan` | 1/1 passed online, then 1/1 offline |
+| Starter context regressions | Internal Mapper registration, default/explicit application scans, compatibility, session selection, backoff | Current hardening: 21/21 passed without a database |
+| External Starter consumer | Isolated local Maven repository, real `@EnableAutoConfiguration`, default business Mapper discovery, no internal-package reference | 1/1 passed online, then 1/1 offline |
 | Historical MySQL double-run | Two independently created `mysql:9.4.0` volumes | 2026-07-20: 46/46 twice, followed by cleanup |
 | Historical random-order probe | Fixed seed `20260720` | 2026-07-20: 46/46, followed by cleanup |
 | Current MySQL release preflight | Fresh `smartorm-release-preflight` Compose project | 2026-08-12: 46/46; 0 failures/errors/skips; container/network/volume residue 0/0/0 |
+| Starter hardening MySQL regression | Fresh `smartorm-starter-mapper-hardening` Compose project | 2026-08-13: 46/46; cleanup residue 0/0/0 |
 | GitHub Actions | JDK 17, 28 tests, MySQL suite, package, reports, cleanup | Foundation SHA `c6e8c8b`: exact `push/main` run `31574822720` passed every gate; Starter feature CI is pending |
 
 Compilation, package, and artifact checks are also part of the local release preflight. Each layer proves a different boundary; historical runs are not presented as current evidence. See [Testing](docs/testing.md).

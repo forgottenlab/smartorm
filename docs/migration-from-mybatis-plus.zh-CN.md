@@ -25,9 +25,9 @@
 - 添加本地模块前后都运行原应用及测试套件。
 - 记录当前依赖面：父 reactor 包含兼容 core 与合并式 Starter 子模块；core artifacts 排除 demo class/configuration/SQL，MPJ 保持传递，JSqlParser/Web/MySQL 按文档为 optional。
 
-当前限制：core 与开发版 Starter 都有隔离本地仓库使用方证据，包括离线复跑，但两者都没有经过验证的 Maven Central 发布。Starter feature checkpoint 也尚无远程 CI 与真实项目接入证据。这些证据只证明本地 dependency-only 路径，不代表公共安装可用。
+当前限制：core 与开发版 Starter 都有隔离本地仓库使用方证据，包括离线复跑，但两者都没有经过验证的 Maven Central 发布。hardening 前的 Starter checkpoint `b90b4c3` 已在远程 feature branch，但没有 feature SHA CI 证据；本轮 hardening commits 仍在本地，且真实项目接入未验证。这些证据只证明本地 dependency-only 路径，不代表公共安装可用。
 
-本地 2.1.x Starter 路径使用 `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`；它消除 SmartORM component scan，但仍依赖应用已有 MyBatis 注册提供恰好一个 `SmartNativeMapper`。直接 core 路径仍为 `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`，并保留显式 component 注册。
+本地 2.1.x Starter 路径使用 `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`；它消除 SmartORM component/内部 Mapper 扫描，并基于无歧义的应用 session 基础设施精确注册内部 Mapper。应用继续只扫描自己的业务 Mapper。直接 core 路径仍为 `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`，并保留显式 component/内部 Mapper 注册。
 
 回滚：如果保留 SmartORM，移除 Starter 并恢复显式 core component 注册；或完全移除 SmartORM 依赖及扫描配置。
 

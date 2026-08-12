@@ -48,7 +48,7 @@
 | 普通主 JAR 与 sources/Javadoc/POM | 🧪 Locally Verified | Package 与 archive 检查通过，未忽略 Javadoc 错误 |
 | Artifact 排除 demo class/configuration/SQL | 🧪 Locally Verified | 仓库仍保留 demo 源码 |
 | 隔离本地 install 与使用方 smoke | 🧪 Locally Verified | 2 个使用方测试通过，包括离线复跑 |
-| 2.1.x 开发版 Starter artifact 与使用方 | 🧪 Locally Verified | 普通 Starter JAR；8/8 上下文测试；外部使用方 1/1 及离线复跑 |
+| 2.1.x 开发版 Starter artifact 与使用方 | 🧪 Locally Verified | 普通 Starter JAR；21/21 上下文测试；默认扫描外部使用方 1/1 及离线复跑 |
 | Javadoc warning 策略 | ⏳ Pending | 生成通过；文档质量 warning 仍需所有者阈值 |
 | 源码作者邮箱署名决策 | ⏳ Pending | 既有署名不是 secret，但发布策略需所有者确认 |
 | 位级可重复构建期望 | ⏳ Pending | ZIP timestamp 未归一化，不声明可重复性 |
