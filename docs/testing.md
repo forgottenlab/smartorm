@@ -26,7 +26,7 @@ mvn -o test-compile
 The current 28-test set directly exercises native SQL rendering/binding and empty-`WHERE` mutation safety without Spring Boot, MySQL, network services, or test order dependencies:
 
 ```powershell
-mvn -o '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
+mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
 ```
 
 Coverage includes sequential/out-of-order/sparse/repeated placeholders, explicit/inferred JOIN predicates, aliases, pagination rendering, invalid indices, empty/disabled mutation predicates, explicit full-table opt-in, and input immutability.
@@ -79,7 +79,7 @@ Use a unique project name and always remove its volume:
 ```powershell
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml config --quiet
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml up -d --wait
-mvn -o '-Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest' test
+mvn -o -pl smartorm '-Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest' test
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml down -v --remove-orphans
 ```
 

@@ -13,12 +13,12 @@
     </parent>
 
     <groupId>io.github.forgottenlab</groupId>
-    <artifactId>smartorm</artifactId>
-    <version>2.0.0</version>
-    <packaging>jar</packaging>
+    <artifactId>smartorm-parent</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <name>SmartORM</name>
-    <description>An annotation-driven enhancement toolkit for MyBatis-Plus / 基于注解驱动的 MyBatis-Plus 增强工具</description>
+    <name>SmartORM Parent</name>
+    <description>Build parent for SmartORM and its Spring Boot Starter</description>
     <url>https://github.com/forgottenlab/smartorm</url>
 
     <licenses>
@@ -47,189 +47,12 @@
         <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <mybatis-plus.version>3.5.14</mybatis-plus.version>
-        <mybatis-plus-join.version>1.5.5</mybatis-plus-join.version>
-        <mysql.version>9.4.0</mysql.version>
-        <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.11.3</maven-javadoc-plugin.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
     </properties>
 
-    <dependencies>
-        <!-- MyBatis-Plus -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-            <version>${mybatis-plus.version}</version>
-        </dependency>
-
-        <!-- MyBatis-Plus JSqlParser support -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-jsqlparser</artifactId>
-            <version>${mybatis-plus.version}</version>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- MyBatis-Plus-Join -->
-        <dependency>
-            <groupId>com.github.yulichang</groupId>
-            <artifactId>mybatis-plus-join-boot-starter</artifactId>
-            <version>${mybatis-plus-join.version}</version>
-        </dependency>
-
-        <!-- Spring -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-
-        <!-- AOP runtime support -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
-
-        <!-- Demo / local run support -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- MySQL -->
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql.version}</version>
-            <scope>runtime</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <resources>
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/application*.yml</include>
-                    <include>**/application*.yaml</include>
-                    <include>**/application*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <excludes>
-                    <exclude>**/application*.yml</exclude>
-                    <exclude>**/application*.yaml</exclude>
-                    <exclude>**/application*.properties</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>${project.basedir}</directory>
-                <targetPath>META-INF</targetPath>
-                <includes>
-                    <include>LICENSE</include>
-                </includes>
-            </resource>
-        </resources>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>application.yaml</exclude>
-                        <exclude>demo/**</exclude>
-                        <exclude>io/github/forgottenlab/smartorm/demo/**</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven-source-plugin.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>application.yaml</exclude>
-                        <exclude>demo/**</exclude>
-                        <exclude>io/github/forgottenlab/smartorm/demo/**</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven-javadoc-plugin.version}</version>
-                <configuration>
-                    <author>false</author>
-                    <excludePackageNames>io.github.forgottenlab.smartorm.demo:io.github.forgottenlab.smartorm.demo.*</excludePackageNames>
-                    <notimestamp>true</notimestamp>
-                    <tags>
-                        <tag>
-                            <name>Details</name>
-                            <placement>a</placement>
-                            <head>Details:</head>
-                        </tag>
-                        <tag>
-                            <name>CreateDate</name>
-                            <placement>a</placement>
-                            <head>Created:</head>
-                        </tag>
-                        <tag>
-                            <name>LastModified</name>
-                            <placement>a</placement>
-                            <head>Last modified:</head>
-                        </tag>
-                        <tag>
-                            <name>VersionHistory</name>
-                            <placement>a</placement>
-                            <head>Version history:</head>
-                        </tag>
-                    </tags>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <release>${java.version}</release>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <modules>
+        <module>smartorm</module>
+        <module>smartorm-spring-boot-starter</module>
+    </modules>
 
 </project>

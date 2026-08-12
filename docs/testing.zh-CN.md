@@ -26,7 +26,7 @@ mvn -o test-compile
 当前 28 个测试无需 Spring Boot、MySQL、网络服务或测试顺序，直接覆盖 Native SQL 渲染/绑定与空 `WHERE` 写操作安全：
 
 ```powershell
-mvn -o '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
+mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
 ```
 
 覆盖范围包括正常/乱序/稀疏/重复占位符、显式/推断 JOIN 谓词、别名、分页渲染、越界参数、空/禁用写谓词、显式全表 opt-in 和输入不可变性。
@@ -79,7 +79,7 @@ Spring datasource 读取测试 username/password 以及可选 host/port；root p
 ```powershell
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml config --quiet
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml up -d --wait
-mvn -o '-Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest' test
+mvn -o -pl smartorm '-Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest' test
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml down -v --remove-orphans
 ```
 
