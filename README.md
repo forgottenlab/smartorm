@@ -121,7 +121,7 @@ The opt-in bypasses only the missing-effective-`WHERE` refusal. It does not add 
 | Historical random-order probe | Fixed seed `20260720` | 2026-07-20: 46/46, followed by cleanup |
 | Current MySQL release preflight | Fresh `smartorm-release-preflight` Compose project | 2026-08-12: 46/46; 0 failures/errors/skips; container/network/volume residue 0/0/0 |
 | Starter hardening MySQL regression | Fresh `smartorm-starter-mapper-hardening` Compose project | 2026-08-13: 46/46; cleanup residue 0/0/0 |
-| GitHub Actions | JDK 17, 28 tests, MySQL suite, package, reports, cleanup | Foundation SHA `c6e8c8b`: exact `push/main` run `31574822720` passed every gate; Starter feature CI is pending |
+| GitHub Actions | JDK 17, Starter 21, core 28, MySQL 46, package, reports, cleanup | Foundation SHA `c6e8c8b`: exact `push/main` run `31574822720` passed; Starter SHA `18554e6`: Draft PR #1 `pull_request` run `32653878401` completed successfully |
 
 Compilation, package, and artifact checks are also part of the local release preflight. Each layer proves a different boundary; historical runs are not presented as current evidence. See [Testing](docs/testing.md).
 

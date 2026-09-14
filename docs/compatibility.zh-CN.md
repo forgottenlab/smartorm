@@ -24,7 +24,7 @@
 | Core 外部使用方 | 隔离本地 Maven 仓库 | 2 个测试联网通过并再次离线复跑通过 |
 | Starter 外部使用方 | Boot 3.5.5，隔离本地 Maven 仓库 | 真实 `@EnableAutoConfiguration` 与默认应用 Mapper 发现，在无数据库连接和内部 package 引用下联网 1/1、离线 1/1 通过 |
 
-额外固定 seed 的随机类/方法顺序运行也在 2026-07-20 通过全部 46 个数据库测试。2026-08-12 release preflight 中，全新 `smartorm-release-preflight` 环境通过 46/46，清理后项目 container、network 与 volume 均为 0。随后 GitHub Actions run `31574822720` 验证了准确 main SHA `c6e8c8b`：远程 28/28、MySQL 46/46、package、报告上传与 cleanup 全部通过。hardening 前的 Starter feature checkpoint 已 push 至 `b90b4c3`；本轮 hardening commits 只有本地证据，未 push。
+额外固定 seed 的随机类/方法顺序运行也在 2026-07-20 通过全部 46 个数据库测试。2026-08-12 release preflight 中，全新 `smartorm-release-preflight` 环境通过 46/46，清理后项目 container、network 与 volume 均为 0。随后 GitHub Actions run `31574822720` 验证了准确 main SHA `c6e8c8b`：远程 28/28、MySQL 46/46、package、报告上传与 cleanup 全部通过。Hardened Starter feature SHA `18554e6` 已 push，Draft PR #1 的 `pull_request` run `32653878401` 成功完成 Starter 21/21、core 28/28、MySQL 46/46、package、报告上传与专用 Compose 资源移除。
 
 ## 🚫 未验证
 
@@ -35,7 +35,6 @@
 - Gradle 使用方构建。
 - Maven Central 签名、上传、仓库接收或 namespace 校验。
 - 通过 Maven Central 消费 core 或 Starter artifact。
-- 当前 Starter feature checkpoint 的远程 CI。
 - 在独立真实应用或 Lingxi 模块中接入，包括通过 Starter 执行真实数据库路径。
 - 位级可重复 artifact 或不可变 runner/container 输入。
 

@@ -26,18 +26,19 @@
 
 ## 🚀 In Progress — 2.1.x 接入体验
 
-当前开发线已在本地实现并验证：
+当前开发线已在本地及精确 head 的 pull-request CI 中实现并验证：
 
 - 包含兼容 `smartorm` core 与合并式 `smartorm-spring-boot-starter` 的父 reactor；
 - 通过 `AutoConfiguration.imports` 发现，无需扫描 SmartORM component；
 - 延迟精确注册一个内部 `SmartNativeMapper`，应用继续拥有业务 Mapper 发现与 MyBatis/数据库/事务基础设施；
 - 21 个数据库无关自动配置测试，以及包含离线复跑和默认业务 Mapper 扫描的隔离外部 Spring Boot 使用方测试；
 - 拓扑变更后完整的 core 回归与可销毁 MySQL 检查。
+- 已 push 的 feature SHA `18554e6` 与成功的 Draft PR #1 `pull_request` run `32653878401`；
+- 已完成只读 Lingxi 审计，并选择一个可回滚的 `user-service` Mapper 方法作为拟议 pilot 范围。
 
 仍需通过单独获批任务完成：
 
-- push Starter feature checkpoint 并进行精确 SHA 远程 CI；
-- 先制定隔离接入计划，再在未来获得明确授权后执行真实项目迁移；
+- 获得明确授权后执行 Lingxi pilot 源码迁移，并证明行为等价；
 - 聚焦的配置属性/元数据；
 - 已注册 Mapper 的声明校验；
 - 脱敏诊断/Doctor 与可操作 FailureAnalyzer。
@@ -87,8 +88,9 @@ Starter 契约稳定后的候选项：
 
 1. 可信测试与公开文档；
 2. 可评审 release foundation 与使用方测试；
-3. 在兼容 artifact 上完成最小本地 Starter foundation（已完成），然后进行远程验证与隔离接入规划；
-4. API 易用性改进；
-5. major version 模块拆分。
+3. 完成最小 Starter foundation、精确 head 远程验证与隔离接入规划；
+4. 获得明确授权后执行 Lingxi 单方法 pilot 迁移并证明等价；
+5. API 易用性改进；
+6. major version 模块拆分。
 
 只有用户最新批准的任务可以授权实施。

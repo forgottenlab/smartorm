@@ -50,7 +50,7 @@ mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererT
 
 当前 `.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 28 个数据库无关 core 测试与 21 个 Starter 上下文测试，启动 Compose MySQL，运行准确的 46 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
 
-Foundation SHA `c6e8c8b` 的精确 `push/main` 运行已通过只读方式核验为 run `31574822720`。它通过了 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。hardening 前的 Starter checkpoint `b90b4c3` 已存在于远程 feature branch，但没有产生该 feature SHA 的 workflow run；本轮 hardening commits 仍只在本地，需在获得明确 push 授权后另行取得远程证据。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
+Foundation SHA `c6e8c8b` 的精确 `push/main` run `31574822720` 已通过只读方式核验；它通过了 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。随后，hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` 由 Draft PR #1 的 `pull_request` run `32653878401` 验证，该 run 成功完成 Starter 21/21、core 28/28、MySQL 46/46、package、报告上传与专用 Compose 资源移除。远程 workflow 没有额外执行数字式的 cleanup 后 `0/0/0` 枚举。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
 
 ### 🧩 Starter 测试
 

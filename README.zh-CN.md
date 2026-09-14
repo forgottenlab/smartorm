@@ -121,7 +121,7 @@ Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再�
 | 历史随机顺序探针 | 固定 seed `20260720` | 2026-07-20：46/46，随后清理 |
 | 本轮 MySQL release preflight | 全新 `smartorm-release-preflight` Compose 项目 | 2026-08-12：46/46；0 failures/errors/skips；container/network/volume 残留 0/0/0 |
 | Starter hardening MySQL 回归 | 全新 `smartorm-starter-mapper-hardening` Compose 项目 | 2026-08-13：46/46；cleanup 残留 0/0/0 |
-| GitHub Actions | JDK 17、28 测试、MySQL 套件、package、报告与 cleanup | Foundation SHA `c6e8c8b`：精确 `push/main` run `31574822720` 通过全部门禁；Starter feature CI 待执行 |
+| GitHub Actions | JDK 17、Starter 21、core 28、MySQL 46、package、报告与 cleanup | Foundation SHA `c6e8c8b`：精确 `push/main` run `31574822720` 通过；Starter SHA `18554e6`：Draft PR #1 的 `pull_request` run `32653878401` 成功完成 |
 
 本地 preflight 还包含编译、package 与 artifact 检查。各层证据证明的边界不同，历史运行不会被当成本轮结果。详见[测试](docs/testing.zh-CN.md)。
 

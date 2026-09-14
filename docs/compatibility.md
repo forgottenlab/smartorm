@@ -24,7 +24,7 @@
 | Core external consumer | isolated local Maven repository | Two tests passed online and passed again offline |
 | Starter external consumer | Boot 3.5.5, isolated local Maven repository | Real `@EnableAutoConfiguration` plus default application Mapper discovery passed 1/1 online and 1/1 offline without a database connection or internal-package reference |
 
-An additional fixed-seed randomized class/method-order run passed all 46 database tests on 2026-07-20. In the 2026-08-12 release preflight, a new `smartorm-release-preflight` environment passed 46/46 and cleanup left zero project containers, networks, and volumes. GitHub Actions run `31574822720` then verified exact main SHA `c6e8c8b`: remote 28/28, MySQL 46/46, package, report upload, and cleanup all passed. The pre-hardening Starter feature checkpoint was pushed at `b90b4c3`, but current hardening commits have only local evidence and were not pushed in this task.
+An additional fixed-seed randomized class/method-order run passed all 46 database tests on 2026-07-20. In the 2026-08-12 release preflight, a new `smartorm-release-preflight` environment passed 46/46 and cleanup left zero project containers, networks, and volumes. GitHub Actions run `31574822720` then verified exact main SHA `c6e8c8b`: remote 28/28, MySQL 46/46, package, report upload, and cleanup all passed. Hardened Starter feature SHA `18554e6` was pushed and Draft PR #1 `pull_request` run `32653878401` completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal.
 
 ## 🚫 Not Verified
 
@@ -35,7 +35,6 @@ An additional fixed-seed randomized class/method-order run passed all 46 databas
 - Gradle consumer builds.
 - Maven Central signing, upload, repository acceptance, or namespace verification.
 - Maven Central consumption of either the core or Starter artifact.
-- Remote CI for the current Starter feature checkpoint.
 - Adoption in an independent real application or Lingxi module, including real database execution through the Starter.
 - Bit-for-bit reproducible artifacts or immutable runner/container inputs.
 

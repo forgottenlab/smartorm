@@ -26,18 +26,19 @@ Current evidence:
 
 ## 🚀 In Progress — 2.1.x Adoption Experience
 
-Locally implemented and verified in the current development line:
+Implemented and verified locally and by exact-head pull-request CI in the current development line:
 
 - a parent reactor with compatible `smartorm` core and a combined `smartorm-spring-boot-starter`;
 - `AutoConfiguration.imports` discovery without SmartORM component scanning;
 - late precise registration of one internal `SmartNativeMapper`, while application business Mapper discovery and MyBatis/database/transaction infrastructure remain application-owned;
 - 21 database-free auto-configuration tests and an isolated default-scanning Spring Boot consumer test, including an offline repeat;
 - full core regression and disposable MySQL checks after the topology change.
+- pushed feature SHA `18554e6` and successful Draft PR #1 `pull_request` run `32653878401`;
+- a read-only Lingxi audit that selected one reversible `user-service` Mapper method as the proposed pilot scope.
 
 Still gated by separately approved work:
 
-- push and exact-SHA remote CI for the Starter feature checkpoint;
-- an isolated adoption plan, followed later by an explicitly authorized real-project migration;
+- the explicitly authorized Lingxi pilot source migration and behavioral-equivalence proof;
 - focused configuration properties/metadata;
 - registered-Mapper declaration validation;
 - redacted diagnostics/Doctor and actionable failure analysis.
@@ -87,8 +88,9 @@ The intended order is:
 
 1. trusted tests and public documentation;
 2. reviewable release foundation and consumer tests;
-3. minimal local Starter foundation on the compatible artifact (complete), followed by remote validation and isolated adoption planning;
-4. API usability improvements;
-5. major-version module separation.
+3. minimal Starter foundation, exact-head remote validation, and isolated adoption planning (complete);
+4. explicitly authorized one-method Lingxi pilot migration and equivalence proof;
+5. API usability improvements;
+6. major-version module separation.
 
 Only the latest user-approved task authorizes work.
