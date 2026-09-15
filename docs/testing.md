@@ -26,7 +26,7 @@ mvn -o test-compile
 The current 28-test set directly exercises native SQL rendering/binding and empty-`WHERE` mutation safety without Spring Boot, MySQL, network services, or test order dependencies:
 
 ```powershell
-mvn -o '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
+mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
 ```
 
 Coverage includes sequential/out-of-order/sparse/repeated placeholders, explicit/inferred JOIN predicates, aliases, pagination rendering, invalid indices, empty/disabled mutation predicates, explicit full-table opt-in, and input immutability.
@@ -48,9 +48,21 @@ The integration environment is defined by `docker-compose.test.yml`:
 
 ### ☁️ CI Verification
 
-`.github/workflows/test.yml` selects JDK 17, enables Maven dependency caching, compiles tests, runs the 28 database-independent tests, starts the Compose MySQL service, runs the exact 46 database tests, packages without rerunning tests, uploads Surefire reports, and defines an `if: always()` cleanup step.
+The current `.github/workflows/test.yml` selects JDK 17, enables Maven dependency caching, compiles tests, runs the 28 database-independent core tests and 21 Starter context tests, starts the Compose MySQL service, runs the exact 46 database tests, packages without rerunning tests, uploads Surefire reports, and defines an `if: always()` cleanup step.
 
-The exact `push/main` run for Foundation SHA `c13426d` was inspected read-only as run `30647688231`. It passed the 28 database-independent tests, 46 MySQL tests, package, Surefire upload, and always-cleanup steps. This is remote evidence for that SHA only; the new local checkpoint HEAD requires a separate run after push. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
+The exact `push/main` run for Foundation SHA `c6e8c8b` was inspected read-only as run `31574822720`; it passed the 28 database-independent tests, 46 MySQL tests, package, Surefire upload, and always-cleanup steps. Hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` was then verified by Draft PR #1 `pull_request` run `32653878401`, which completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal. The remote workflow does not perform a separate numeric post-cleanup `0/0/0` enumeration. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
+
+### 🧩 Starter Tests
+
+The focused auto-configuration suite is database-independent:
+
+```powershell
+mvn -o -pl smartorm-spring-boot-starter -am '-Dtest=SmartOrmAutoConfigurationTest' '-Dsurefire.failIfNoSpecifiedTests=false' test
+```
+
+The current suite passes 21/21 and covers imports discovery, exact internal Mapper metadata, the eight-bean runtime graph, MyBatis Boot default discovery, application-only `@MapperScan`, explicit/legacy compatibility, unique/primary/ambiguous sessions, missing-class/infrastructure and user-bean backoff, infrastructure non-ownership, and zero database interaction during bootstrap.
+
+An external Boot 3.5.5 consumer was generated under ignored `target/` state and resolved only the locally installed `smartorm-spring-boot-starter:2.1.0-SNAPSHOT`. Its single context test passed online and then offline. It used MyBatis Boot default discovery for its own Mapper, contained no SmartORM internal-package reference or manual Native Mapper definition, and verified zero database connections; it is not a maintained sample project.
 
 ## ✅ Requirements
 
@@ -79,7 +91,7 @@ Use a unique project name and always remove its volume:
 ```powershell
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml config --quiet
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml up -d --wait
-mvn -o '-Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest' test
+mvn -o -pl smartorm '-Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest' test
 docker compose -p smartorm-it-run1 -f docker-compose.test.yml down -v --remove-orphans
 ```
 
@@ -102,23 +114,24 @@ The first row is current-preflight evidence. The three 2026-07-20 rows are retai
 
 ## 📦 Artifact Preflight
 
-After test compilation and the focused 28-test suite passed separately, the current preflight completed an online clean package with tests intentionally skipped:
+After test compilation, the 28 core regressions, and the 21 Starter tests passed separately, the current reactor completed an offline package with tests intentionally skipped:
 
 ```powershell
-mvn -DskipTests clean package
+mvn -o -DskipTests package
 ```
 
 The following outputs were generated and inspected:
 
-- an ordinary library main JAR, not a Spring Boot executable JAR;
-- sources and Javadoc JARs;
+- an ordinary core library main JAR, not a Spring Boot executable JAR;
+- core sources and Javadoc JARs;
+- an ordinary Starter JAR with exactly one `AutoConfiguration.imports` entry;
 - the POM stored in the isolated Maven repository layout;
 - artifact contents excluding demo classes, `application.yaml`, and demo SQL while retaining the repository demo sources;
 - the repository `LICENSE` and packaged license metadata.
 
-The package validation used an isolated Maven cache, and the install used a newly created isolated `maven.repo.local`. A separate external consumer then passed two tests against the installed artifact, and the same consumer tests passed again offline. This validates the local published-like artifact path only; Maven Central has not been configured, uploaded to, or consumed from.
+The earlier core package validation used an isolated Maven cache and its external consumer passed two tests plus an offline repeat. The current Starter reactor was also installed into a separate ignored `maven.repo.local`; its external consumer passed one test plus an offline repeat. These checks validate local published-like artifact paths only; Maven Central has not been configured, uploaded to, or consumed from.
 
-This result does not establish bit-for-bit reproducibility, signing, remote repository acceptance, or remote CI success.
+This result does not establish bit-for-bit reproducibility, signing, remote repository acceptance, or remote CI success for the Starter feature checkpoint.
 
 ## 🛡️ Safety Rules
 

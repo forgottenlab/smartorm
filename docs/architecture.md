@@ -2,11 +2,16 @@
 
 [English](architecture.md) · [简体中文](architecture.zh-CN.md)
 
-> **Summary:** SmartORM 2.0.x uses a single-module, layered runtime. This document separates that implemented shape from future architecture; planned modules and Starter types are not available today.
+> **Summary:** SmartORM keeps the verified 2.0.x layered runtime inside the compatible `smartorm` artifact. The 2.1.x development line adds a Maven reactor and a minimal combined Spring Boot Starter without performing the planned 3.0 semantic split.
 
 ## 🧭 Current Scope
 
-SmartORM remains one Maven module whose source tree contains library code, Spring integration, the demo application/configuration, MPJ integration, MySQL support/resources, and tests. The 2.0.x release build produces an ordinary library main JAR plus sources and Javadoc JARs. Demo classes, `application.yaml`, and demo SQL are excluded from release artifacts while remaining available in the repository source tree. There is no AutoConfiguration or physical child module.
+The root project is now the `io.github.forgottenlab:smartorm-parent:2.1.0-SNAPSHOT` aggregator with two children:
+
+- `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`, the compatible combined library whose Java packages and public API are unchanged;
+- `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`, a combined Starter and auto-configuration artifact.
+
+Library, Spring integration, MPJ, MySQL support, tests, and demo sources still share the `smartorm` child; this is not the future core/Spring/JOIN semantic split. The core build continues to produce an ordinary main JAR plus sources and Javadoc JARs. Demo classes, `application.yaml`, and demo SQL remain in source but are excluded from release-shaped artifacts.
 
 ## 🔄 Runtime Pipeline
 
@@ -36,6 +41,7 @@ Lifecycle hooks on `SmartMapper` are called around the Aspect path: `beforeSmart
 | `mapper` | `SmartMapper` and internal `SmartNativeMapper` |
 | `support`, `util` | JOIN inference, mapping, metadata, expressions, and helpers |
 | `demo` | Embedded application, entities, Mappers, and MyBatis configuration |
+| Starter `autoconfigure` | `SmartOrmAutoConfiguration` and its package-private runtime bean registrar |
 
 ## 🔎 Non-JOIN Query Path
 
@@ -58,17 +64,31 @@ Before update/delete execution, `SmartMutationSafetyGuard` inspects final predic
 
 ## 🔧 Current Integration Requirements
 
-Spring component scanning must include `io.github.forgottenlab.smartorm`, and Mapper scanning must include both application Mappers and `io.github.forgottenlab.smartorm.mapper`. The demo achieves this with `scanBasePackages` and `@MapperScan`.
+Direct use of the `smartorm` core artifact keeps the established manual path: Spring component scanning includes `io.github.forgottenlab.smartorm`, and Mapper scanning includes both application Mappers and `io.github.forgottenlab.smartorm.mapper`.
 
-There is no consumer-oriented Starter, configuration metadata, failure analyzer, startup validator, or Doctor in 2.0.x.
+The 2.1.x development Starter uses this activation path:
+
+```text
+AutoConfiguration.imports
+  -> SmartOrmAutoConfiguration
+  -> BeanFactoryPostProcessor registrar
+  -> reuse or precisely register canonical smartNativeMapper
+  -> SmartNativeExecutor + five handlers + registry + aspect
+```
+
+The Starter does not component-scan SmartORM or application Mapper packages. Applications scan only their own Mappers or keep MyBatis Boot's default discovery. After MyBatis registry post-processors complete, the registrar reuses one compatible `SmartNativeMapper` or registers exactly one canonical `MapperFactoryBean`, so it cannot suppress the application's scanner decision. No hard auto-configuration `before`/`after` ordering is declared.
+
+Activation is deliberately conservative. The Starter prefers one unique or uniquely primary application `SqlSessionTemplate`, then one unique or uniquely primary `SqlSessionFactory`; missing/ambiguous session infrastructure, an incompatible internal Mapper registration, an existing `SmartAnnotationAspect`, or a conflicting runtime bean name causes the complete graph to back off. The Starter registers only its known internal Mapper, never a scanner, and never creates a `DataSource`, session infrastructure, transaction manager, pagination interceptor, or `JdbcMetaProvider`; bootstrap does not connect to a database.
+
+Configuration properties/metadata, declaration validation, a failure analyzer, a startup validator, and a Doctor are not implemented.
 
 ## 🧩 Current Dependency and API Boundaries
 
 - `SmartMapper<T>` publicly extends both `BaseMapper<T>` and `MPJBaseMapper<T>`.
 - MyBatis-Plus-Join remains a transitive dependency because `SmartMapper` exposes `MPJBaseMapper`.
 - JSqlParser is optional; Spring Web and MySQL Connector/J are runtime-optional rather than mandatory transitive consumer dependencies.
-- Demo code and runtime integration still live beside core semantics in the source module, although demo classes/configuration/SQL are excluded from release artifacts.
-- The locally installed artifact has passed a two-test external consumer smoke, including an offline rerun; Maven Central consumption remains unverified.
+- Demo code and runtime integration still live beside core semantics in the `smartorm` child, although demo classes/configuration/SQL are excluded from release artifacts.
+- The locally installed core artifact retains its earlier two-test consumer evidence. The development Starter additionally passed a one-test external Spring Boot consumer smoke and an offline repeat; Maven Central consumption and a real-project adoption remain unverified.
 - `SmartQuery` is public but inactive.
 - Wrapper and native paths do not share identical scalar-binding implementation.
 
@@ -76,10 +96,10 @@ These are compatibility constraints, not hidden implementation details.
 
 ## 🗺️ Future Direction — Planned Only
 
-The roadmap proposes:
+The roadmap now distinguishes the locally implemented Starter foundation from remaining product work:
 
-- 2.1.x: consumer-tested Spring Boot Starter, AutoConfiguration, declaration validation, and diagnostics.
+- 2.1.x: remotely validate the Starter foundation, plan a single-module real-project adoption, then separately design configuration, validation, and diagnostics.
 - 2.2.x: focused API usability improvements after compatibility design.
 - 3.0: physical core/Spring/JOIN/demo separation and a `SmartMapper`/`SmartJoinMapper` boundary.
 
-None of these modules, coordinates, properties, or APIs is implemented by this document. See [Roadmap](roadmap.md).
+The latter items are plans rather than delivered APIs, coordinates, dates, or authorization. See [Roadmap](roadmap.md).

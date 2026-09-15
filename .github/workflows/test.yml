@@ -35,7 +35,17 @@ jobs:
       - name: Run database-free tests
         run: >-
           mvn -B
+          -pl smartorm
           -Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest
+          test
+
+      - name: Run Starter auto-configuration tests
+        run: >-
+          mvn -B
+          -pl smartorm-spring-boot-starter
+          -am
+          -Dtest=SmartOrmAutoConfigurationTest
+          -Dsurefire.failIfNoSpecifiedTests=false
           test
 
       - name: Validate MySQL Compose configuration
@@ -47,6 +57,7 @@ jobs:
       - name: Run database tests
         run: >-
           mvn -B
+          -pl smartorm
           -Dtest=SmartMapperHookTest,SmartMapperCoreTest,MapperUpdateTest,MapperSelectTest,MapperSelectResultTypeTest,MapperPageTest,MapperJoinTest,MapperInsertTest,MapperDeleteTest
           test
 
@@ -58,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: surefire-reports
-          path: target/surefire-reports/
+          path: "**/target/surefire-reports/"
           if-no-files-found: warn
 
       - name: Remove disposable MySQL state

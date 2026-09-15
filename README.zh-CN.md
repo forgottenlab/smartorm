@@ -21,7 +21,7 @@ SmartORM 是一个面向 Spring Boot 与 MyBatis-Plus 的可渐进接入、注�
 它用于减少固定形态的重复 Mapper 代码，同时保留 MyBatis-Plus 的编程模型与原有扩展路径。接入过程可以渐进完成：先选择一个 Mapper、一个方法，保留原实现并行对照，需要时也能回滚，而不必重构整个应用。
 
 > [!NOTE]
-> SmartORM 2.0.x 当前通过源码或本地安装的 Maven artifact 使用。普通库 JAR 与本地使用方接入路径已经验证，但 Maven Central 发布和 Spring Boot Starter 尚不可用。
+> SmartORM 2.0.x 仍是已验证的发布基础。当前 2.1.x 开发线已增加可本地安装的 Spring Boot Starter，但两个 artifact 都尚未发布到 Maven Central。
 
 ## 🚀 当前能力
 
@@ -34,7 +34,7 @@ SmartORM 是一个面向 Spring Boot 与 MyBatis-Plus 的可渐进接入、注�
 | 固定 JOIN 声明 | ✅ 可用 | `@SmartJoin` 支持显式或约定推断 `ON`；当前实现基于 MPJ |
 | 写操作安全 | ✅ 可用 | 默认阻止没有有效 `WHERE` 的 Smart 更新与删除 |
 | 生命周期 Hook | ✅ 可用 | `beforeSmartOperation`、`afterSmartOperation`、`onSmartException` |
-| Spring Boot Starter | 🗺️ 已规划 | 尚未实现；当前需要显式组件扫描与 Mapper 扫描 |
+| Spring Boot Starter | 🧪 开发中 | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` 已在本地验证精确注册一个内部 Mapper，同时保留应用对 MyBatis 基础设施和业务 Mapper 扫描的所有权 |
 
 `@SmartQuery` 当前只是未启用的预留注解，不是受支持的执行入口。
 
@@ -79,27 +79,29 @@ public interface UserMapper extends SmartMapper<User> {
 List<User> activeUsers = userMapper.findByStatus(1);
 ```
 
-`#{0}` 引用 Java 方法的第一个参数。没有 Smart 注解的方法继续使用普通 MyBatis-Plus、Wrapper、XML 或 Provider 行为。当前所需扫描配置见[快速开始](docs/getting-started.zh-CN.md)。
+`#{0}` 引用 Java 方法的第一个参数。没有 Smart 注解的方法继续使用普通 MyBatis-Plus、Wrapper、XML 或 Provider 行为。当前 Starter 与 Mapper 扫描要求见[快速开始](docs/getting-started.zh-CN.md)。
 
 ## 📦 安装方式
 
-Maven Central 尚未发布。克隆并验证仓库后，可把当前 artifact 安装到本地 Maven 仓库：
+Maven Central 尚未发布。克隆并验证仓库后，可把当前 reactor 安装到本地 Maven 仓库：
 
 ```powershell
 mvn -DskipTests install
 ```
 
-本地使用方随后可以声明当前坐标：
+本地 Spring Boot 使用方随后可以声明开发版 Starter 坐标：
 
 ```xml
 <dependency>
     <groupId>io.github.forgottenlab</groupId>
-    <artifactId>smartorm</artifactId>
-    <version>2.0.0</version>
+    <artifactId>smartorm-spring-boot-starter</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
-依赖 `-DskipTests` 前应先单独完成测试门禁；上面的命令只负责安装已经验证的本地构建。主 artifact 是普通库 JAR，并已排除 demo class、`application.yaml` 与 demo SQL。由于 `SmartMapper` 暴露 MPJ，MyBatis-Plus-Join 仍保持传递依赖；JSqlParser、Spring Web 与 MySQL Connector/J 的边界见[兼容性](docs/compatibility.zh-CN.md)。
+Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再对 SmartORM 运行组件执行 component scan。Starter 会精确注册内部 `SmartNativeMapper`；应用只扫描自己的 Mapper package，或继续使用 MyBatis Boot 默认发现。Starter 复用无歧义的应用 `SqlSessionTemplate` 或 `SqlSessionFactory`，不会创建 `DataSource`、session 基础设施、事务管理器或全局 Mapper scanner。已有显式/旧式 Native Mapper 注册会被复用以便迁移；session 缺失或歧义时保守 back off。
+
+依赖 `-DskipTests` 前应先单独完成测试门禁；上面的命令只负责安装已经验证的本地构建。如果应用明确继续使用手动集成路径，也可依赖 `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`。Core artifact 仍是普通库 JAR，并已排除 demo class、`application.yaml` 与 demo SQL。由于 `SmartMapper` 暴露 MPJ，MyBatis-Plus-Join 仍保持传递依赖；JSqlParser、Spring Web 与 MySQL Connector/J 的边界见[兼容性](docs/compatibility.zh-CN.md)。
 
 ## 🛡️ 默认安全
 
@@ -113,10 +115,13 @@ mvn -DskipTests install
 | 层级 | 范围 | 证据 |
 |---|---|---|
 | 数据库无关回归 | Native SQL 渲染/绑定与写操作安全 | 本轮 preflight：28/28 通过 |
+| Starter 上下文回归 | 内部 Mapper 注册、默认/显式应用扫描、兼容、session 选择与 backoff | 本轮 hardening：无数据库 21/21 通过 |
+| 外部 Starter 使用方 | 隔离本地 Maven 仓库、真实 `@EnableAutoConfiguration`、默认业务 Mapper 发现、无内部 package 引用 | 联网 1/1 通过，随后离线 1/1 通过 |
 | 历史 MySQL 双轮 | 两个独立创建的 `mysql:9.4.0` volume | 2026-07-20：两轮各 46/46，随后清理 |
 | 历史随机顺序探针 | 固定 seed `20260720` | 2026-07-20：46/46，随后清理 |
 | 本轮 MySQL release preflight | 全新 `smartorm-release-preflight` Compose 项目 | 2026-08-12：46/46；0 failures/errors/skips；container/network/volume 残留 0/0/0 |
-| GitHub Actions | JDK 17、28 测试、MySQL 套件、package、报告与 cleanup | Foundation SHA `c13426d`：精确 `push/main` 运行通过全部门禁 |
+| Starter hardening MySQL 回归 | 全新 `smartorm-starter-mapper-hardening` Compose 项目 | 2026-08-13：46/46；cleanup 残留 0/0/0 |
+| GitHub Actions | JDK 17、Starter 21、core 28、MySQL 46、package、报告与 cleanup | Foundation SHA `c6e8c8b`：精确 `push/main` run `31574822720` 通过；Starter SHA `18554e6`：Draft PR #1 的 `pull_request` run `32653878401` 成功完成 |
 
 本地 preflight 还包含编译、package 与 artifact 检查。各层证据证明的边界不同，历史运行不会被当成本轮结果。详见[测试](docs/testing.zh-CN.md)。
 
@@ -132,7 +137,7 @@ Annotated Mapper method
   -> MyBatis-Plus / MyBatis
 ```
 
-SmartORM 仍是 Maven 单源码模块。类发布 artifacts 已排除 demo class 与配置，但当前没有 Starter、AutoConfiguration、物理子模块或可选 JOIN 模块。详见[架构](docs/architecture.zh-CN.md)。
+SmartORM 现在使用包含 `smartorm` 与合并式 `smartorm-spring-boot-starter` 子模块的父 reactor。Core 模块保留现有公开坐标与源码 package；demo 源码仍位于 core，但会从类发布 artifacts 中排除。可选 JOIN 模块的拆分仍是未来 major version 工作。详见[架构](docs/architecture.zh-CN.md)。
 
 ## 📚 文档导航
 
@@ -151,7 +156,7 @@ SmartORM 仍是 Maven 单源码模块。类发布 artifacts 已排除 demo class
 
 ## 🗺️ 路线图
 
-当前路线图规划在 2.0.x foundation 之后提供经过使用方测试的 Starter，在后续 2.x 聚焦 API 易用性，并仅在未来 major version 进行物理模块拆分。这些是计划，不是已经交付的 API、坐标、日期或实现授权。详见[路线图](docs/roadmap.zh-CN.md)。
+当前 2.1.x 开发线已包含最小、经过使用方测试的 Starter foundation。配置元数据、校验、诊断、API 易用性与更深的物理拆分仍是需要单独门禁的路线图事项，不是已交付 API 或发布承诺。详见[路线图](docs/roadmap.zh-CN.md)。
 
 ## 🤝 贡献与反馈
 

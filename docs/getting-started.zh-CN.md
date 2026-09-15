@@ -2,7 +2,7 @@
 
 [English](getting-started.md) · [简体中文](getting-started.zh-CN.md)
 
-> **摘要：** 从一个 Mapper 和一个有测试的方法开始。SmartORM 2.0.x 支持源码/本地模块与本地安装 artifact 接入；当前尚未提供已发布的 Spring Boot Starter 或 Maven Central 制品。
+> **摘要：** 从一个 Mapper 和一个有测试的方法开始。已验证的 2.0.x core 路径继续可用，2.1.x 开发线则增加可本地安装的 Starter。两条路径都尚未发布到 Maven Central。
 
 ## ✅ 环境要求
 
@@ -14,42 +14,62 @@
 
 其他版本可能可以运行，但当前不能据此声明为已验证支持。
 
-## 📦 引入当前项目
+## 📦 安装当前开发版 Reactor
 
-评估时可以把本仓库作为 Maven 项目打开、作为本地源码模块引入，或把当前 artifact 安装到仅供评估环境访问的 Maven 仓库。隔离 install 和外部使用方 2 个 smoke tests 已通过，其中使用方还成功离线复跑。
+评估时，克隆并验证本仓库，然后把当前 reactor 安装到本地评估环境可访问的 Maven 仓库：
 
-完成本地安装后，使用方可以声明当前坐标：
+```powershell
+mvn -DskipTests install
+```
+
+应先单独运行测试门禁；`-DskipTests` 只安装已经验证的 checkout。这些开发版坐标尚未在 Maven Central 提供。
+
+### 推荐的 2.1.x 开发版 Starter 路径
+
+Spring Boot 使用方可依赖本地安装的合并式 Starter：
+
+```xml
+<dependency>
+    <groupId>io.github.forgottenlab</groupId>
+    <artifactId>smartorm-spring-boot-starter</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+</dependency>
+```
+
+Starter 通过 `AutoConfiguration.imports` 发现。应用 Mapper scanner 决策完成后，它会基于无歧义的应用 session 基础设施精确注册内部 `SmartNativeMapper`，再注册 executor、五个 handler、registry 与 aspect。
+
+### 直接 Core 路径
+
+明确保留原有手动集成的应用可依赖兼容的 core artifact：
 
 ```xml
 <dependency>
     <groupId>io.github.forgottenlab</groupId>
     <artifactId>smartorm</artifactId>
-    <version>2.0.0</version>
+    <version>2.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
-本轮 preflight 尚未把这些坐标发布到 Maven Central。类发布主 JAR 已排除 demo class、`application.yaml` 和 demo SQL，但仓库仍是包含 demo 的单一源码模块。
+Core JAR 已排除 demo class、`application.yaml` 和 demo SQL，但 `smartorm` 子模块仍保留 demo 源码。
 
 MyBatis-Plus-Join 保持传递依赖。JSqlParser 为 optional；Spring Web 与 MySQL Connector/J 为 runtime + optional。应用需要相应能力时应显式添加 optional 依赖。接入其他项目之前请先阅读[兼容性](compatibility.zh-CN.md)。
 
-## 🔧 注册当前运行组件
+## 🔧 注册 Mapper 边界
 
-当前没有 AutoConfiguration。使用方除了扫描自己的包，还必须扫描 SmartORM 组件和内部 Native Mapper：
+使用 Starter 时，Mapper 扫描继续由应用所有，只扫描应用自己的业务 package（或使用 MyBatis Boot 默认发现）：
 
 ```java
-@SpringBootApplication(scanBasePackages = {
-        "com.example.app",
-        "io.github.forgottenlab.smartorm"
-})
-@MapperScan({
-        "com.example.app.mapper",
-        "io.github.forgottenlab.smartorm.mapper"
-})
+@SpringBootApplication
+@MapperScan("com.example.app.mapper")
 public class ExampleApplication {
 }
 ```
 
-如果使用 `@SmartPage`，请按应用原有方式注册 MyBatis-Plus 分页拦截器。仓库中的 `MyBatisConfig` 提供了当前示例。
+Starter 只注册已知内部 Mapper；不会扫描应用 package，也不创建 Mapper scanner、`DataSource`、`SqlSessionFactory`、`SqlSessionTemplate`、事务管理器或分页拦截器，自身 bootstrap 也不访问数据库。已有显式/旧式内部 Mapper 注册会被复用而不重复。
+
+标准场景使用唯一或唯一 `@Primary` 的应用 `SqlSessionTemplate`，其次使用 `SqlSessionFactory`；session 候选缺失/歧义或运行时 Bean 图冲突时，当前 Starter 会在没有 Validator 或 FailureAnalyzer 的情况下 back off。如果使用 `@SmartPage`，请按应用原有方式注册 MyBatis-Plus 分页拦截器。
+
+仅在直接 core 路径中，还需把 `io.github.forgottenlab.smartorm` 加入 Spring component scan，并把 `io.github.forgottenlab.smartorm.mapper` 加入 Mapper 扫描。Starter 不需要这项手动内部 package 配置。
 
 ## 🧱 定义实体
 
@@ -124,11 +144,15 @@ class UserMapperTest {
 
 ### Smart Handler 或 Aspect 未生效
 
-确认组件扫描包含 `io.github.forgottenlab.smartorm`。未来 Starter 可能消除该手动步骤，但当前尚不存在 Starter。
+使用 Starter 时，确认应用有一个无歧义的 session 候选，且没有冲突的 SmartORM 运行时 Bean 名称或已存在的 `SmartAnnotationAspect`。使用直接 core 路径时，还需确认 SmartORM component 与内部 Mapper package 已被扫描。
 
 ### `SmartNativeMapper` 未注册
 
-JOIN 查询会使用 Native 执行路径。请在 `@MapperScan` 中加入 `io.github.forgottenlab.smartorm.mapper`。
+JOIN 查询会使用 Native 执行路径。使用 Starter 时不要把 SmartORM 内部 package 加入 `@MapperScan`；应检查 session 歧义和冲突的旧注册。只有直接 core 路径需要手动扫描内部 Mapper。
+
+### 没有诊断说明 Starter 为何 back off
+
+该 foundation 尚未实现配置属性/元数据、声明校验、Doctor 或 FailureAnalyzer。请使用聚焦的上下文测试并检查 Mapper/Bean 所有权边界，同时避免记录敏感 datasource 值。
 
 ### 占位符下标越界
 

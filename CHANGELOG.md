@@ -7,24 +7,33 @@
 ### Added
 - `SmartUpdate.allowFullTable` 与 `SmartDelete.allowFullTable`，默认值均为 `false`，用于显式声明有意执行全表写操作。
 - 固定 `mysql:9.4.0`、可清理且仅绑定 loopback 的 Docker Compose 测试环境，以及隔离主数据源的 Spring `test` profile。
-- Java 17 / MySQL 集成测试 GitHub Actions 工作流与 Surefire 报告归档步骤；Foundation SHA `c13426d` 的精确远程运行已通过。
+- Java 17 / MySQL 集成测试 GitHub Actions 工作流与 Surefire 报告归档步骤；main SHA `c6e8c8b` 的精确远程 run `31574822720` 已通过。
 - 英文默认 `README.md`、中文 `README.zh-CN.md`，以及双语 Getting Started、Migration、Safety、Testing、Architecture、Compatibility、Roadmap 和 Release Checklist。
 - 仓库级 Apache License 2.0 `LICENSE` 文件。
 - 普通库主 JAR、sources JAR、Javadoc JAR 与类发布 POM 的本地构建/检查链路，以及隔离本地仓库的外部使用方 smoke test。
+- `smartorm-parent`、兼容 `smartorm` core 与合并式 `smartorm-spring-boot-starter` 的 `2.1.0-SNAPSHOT` Maven reactor。
+- 通过 `AutoConfiguration.imports` 发现的 `SmartOrmAutoConfiguration`，以及在应用 Mapper scanner 完成后精确注册内部 `SmartNativeMapper` 并组建最小 SmartORM 运行图的 package-private registrar。
+- 21 个数据库无关 Starter 上下文测试，以及使用隔离本地 Maven 仓库、默认业务 Mapper 发现的外部 Spring Boot 使用方 1 个 smoke test 与离线复跑。
 
 ### Changed
 - `SmartUpdate` / `SmartDelete` 现在基于最终结构化 WHERE 谓词默认拒绝无条件全表操作；此前依赖空 WHERE 的调用需要显式设置 `allowFullTable = true`。
 - 公开文档明确将 SmartORM 定位为 Spring Boot 与 MyBatis-Plus 的按需增强，而不是 MyBatis、MyBatis-Plus、Wrapper、XML、Provider 或 MPJ 的替代品。
 - 双语 README 采用对齐的 GitHub Hero、真实 badge、能力/适用场景/测试证据表格与安全提示；公开文档统一语言切换、摘要和可扫读标题层级。
-- Testing 与 Release Checklist 现在明确区分本轮全新 MySQL 46/46 本地 preflight、保留的历史数据库证据、已验证的 Foundation 远程 CI 与仍待 push 的新 checkpoint HEAD。
+- Testing 与 Release Checklist 现在明确区分本轮全新 MySQL 46/46 本地 preflight、保留的历史数据库证据，以及 main 与 hardened Starter feature checkpoint 的精确 SHA 远程 CI。
 - 数据库测试改为显式激活隔离 `test` profile，并强化确定性 fixture、行数、分页、异常和 JOIN 断言。
-- 发布 artifacts 排除 demo class、`application.yaml` 与 demo SQL；demo 源码仍保留在当前单模块仓库中。
+- 原根 `src` 机械迁入 `smartorm` 子模块，文件内容哈希、现有 artifactId、Java package 与公开 API 保持不变。
+- Core 发布 artifacts 排除 demo class、`application.yaml` 与 demo SQL；demo 源码仍保留在 `smartorm` 子模块中。
+- Starter 复用已有兼容 `SmartNativeMapper`，否则用无歧义的应用 session 精确注册一个 canonical Mapper；不扫描 package、不创建数据库/事务基础设施，session 歧义或 Bean 冲突时整个运行图保守 back off。
 - JSqlParser 改为 optional，Spring Web 与 MySQL Connector/J 改为 runtime + optional；由于公开 Mapper 类型边界，MyBatis-Plus-Join 保持传递依赖。
 - Maven package 生成普通库 JAR，并附加 sources/Javadoc artifacts；这不代表 Maven Central 已发布。
 
 ### Fixed
 - 修复 Native SQL 使用原方法参数索引访问紧凑绑定列表导致的乱序/稀疏参数错误。
 - 修复显式 JOIN `ON` 被整体当作标量参数的问题；结构保留为受控 SQL 谓词，其中运行时标量继续绑定。
+
+### Notes
+- `2.1.0-SNAPSHOT` Starter 仍是未在 Maven Central 发布的开发 foundation；hardened feature SHA `18554e6` 已 push，Draft PR #1 的 `pull_request` run `32653878401` 已成功完成，但 PR 尚未 merge，也没有 tag 或 release。
+- 本轮没有实现配置属性/元数据、Validator、Doctor、FailureAnalyzer 或 3.0 语义模块拆分。
 
 ## [2.0.0] - 2026-04-22
 
