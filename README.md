@@ -27,14 +27,14 @@ It removes repetitive, fixed-shape Mapper code while preserving the MyBatis-Plus
 
 | Capability | Status | Current behavior |
 |---|---|---|
-| Annotation-driven CRUD | ✅ Available | `@SmartSelect`, `@SmartInsert`, `@SmartUpdate`, and `@SmartDelete` opt in per Mapper method |
-| Pagination | ✅ Available | `@SmartPage` and `PageResult`; the application registers the MyBatis-Plus pagination interceptor |
-| DTO / `Map` mapping | ✅ Available | Query result inference supports entity, `Map`, DTO/VO, and single-result paths |
-| Native SQL path | ✅ Available | Rendered SQL keeps placeholder order aligned with its compact bound-parameter list |
-| Fixed JOIN declarations | ✅ Available | `@SmartJoin` supports explicit or convention-inferred `ON`; the current implementation is MPJ-based |
-| Mutation safety | ✅ Available | Smart update/delete operations without an effective `WHERE` are blocked by default |
-| Lifecycle hooks | ✅ Available | `beforeSmartOperation`, `afterSmartOperation`, and `onSmartException` |
-| Spring Boot Starter | 🧪 Development | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` locally registers its one internal Mapper while preserving application-owned MyBatis infrastructure and business Mapper scanning |
+| Annotation-driven&nbsp;CRUD | ✅&nbsp;Available | `@SmartSelect`, `@SmartInsert`, `@SmartUpdate`, and `@SmartDelete` opt in per Mapper method |
+| Pagination | ✅&nbsp;Available | `@SmartPage` and `PageResult`; the application registers the MyBatis-Plus pagination interceptor |
+| DTO&nbsp;/&nbsp;`Map`&nbsp;mapping | ✅&nbsp;Available | Query result inference supports entity, `Map`, DTO/VO, and single-result paths |
+| Native&nbsp;SQL&nbsp;path | ✅&nbsp;Available | Rendered SQL keeps placeholder order aligned with its compact bound-parameter list |
+| Fixed&nbsp;JOIN&nbsp;declarations | ✅&nbsp;Available | `@SmartJoin` supports explicit or convention-inferred `ON`; the current implementation is MPJ-based |
+| Mutation&nbsp;safety | ✅&nbsp;Available | Smart update/delete operations without an effective `WHERE` are blocked by default |
+| Lifecycle&nbsp;hooks | ✅&nbsp;Available | `beforeSmartOperation`, `afterSmartOperation`, and `onSmartException` |
+| Spring&nbsp;Boot&nbsp;Starter | 🧪&nbsp;Snapshot | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` is implemented and remotely verified; it registers its single internal Mapper while preserving application-owned MyBatis infrastructure and business Mapper scanning. It has not yet been published to Maven Central as a stable release. |
 
 `@SmartQuery` is an inactive placeholder, not a supported execution entry point.
 
@@ -42,7 +42,7 @@ It removes repetitive, fixed-shape Mapper code while preserving the MyBatis-Plus
 
 | Good fit | Consider alternatives |
 |---|---|
-| Spring Boot applications already using MyBatis-Plus<br>Fixed CRUD and deterministic pagination<br>DTO / `Map` projections and fixed JOINs<br>Repeated Mapper template SQL<br>Teams that want gradual, reversible adoption | Non-Spring or reactive applications<br>Highly dynamic or database-specific SQL<br>Stored procedures<br>Mature complex XML/Provider SQL with no maintenance problem<br>Projects requiring a currently verified multi-database dialect layer |
+| Spring Boot applications already using MyBatis-Plus; projects with fixed CRUD, deterministic pagination, DTO / `Map` projections, fixed JOINs, or repeated Mapper template SQL; teams that want gradual, reversible SmartORM adoption. | Non-Spring or reactive applications; highly dynamic or database-specific SQL; stored procedures; mature complex XML / Provider SQL with no clear maintenance pain; projects that require a fully verified multi-database dialect layer in the current version. |
 
 ## 🚫 What It Does Not Replace
 
