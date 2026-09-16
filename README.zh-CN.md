@@ -27,14 +27,14 @@ SmartORM 是一个面向 Spring Boot 与 MyBatis-Plus 的可渐进接入、注�
 
 | 能力 | 状态 | 当前行为 |
 |---|---|---|
-| 注解驱动 CRUD | ✅ 可用 | `@SmartSelect`、`@SmartInsert`、`@SmartUpdate`、`@SmartDelete` 按 Mapper 方法选择性启用 |
-| 分页 | ✅ 可用 | `@SmartPage` 与 `PageResult`；应用需注册 MyBatis-Plus 分页拦截器 |
-| DTO / `Map` 映射 | ✅ 可用 | 查询结果推断支持 Entity、`Map`、DTO/VO 与单结果路径 |
-| Native SQL 路径 | ✅ 可用 | 渲染后的 SQL 占位符顺序与紧凑绑定参数列表保持一致 |
-| 固定 JOIN 声明 | ✅ 可用 | `@SmartJoin` 支持显式或约定推断 `ON`；当前实现基于 MPJ |
-| 写操作安全 | ✅ 可用 | 默认阻止没有有效 `WHERE` 的 Smart 更新与删除 |
-| 生命周期 Hook | ✅ 可用 | `beforeSmartOperation`、`afterSmartOperation`、`onSmartException` |
-| Spring Boot Starter | 🧪 开发中 | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` 已在本地验证精确注册一个内部 Mapper，同时保留应用对 MyBatis 基础设施和业务 Mapper 扫描的所有权 |
+| 注&#x2060;解&#x2060;驱&#x2060;动&nbsp;CRUD | ✅&nbsp;&#x2060;可&#x2060;用 | `@SmartSelect`、`@SmartInsert`、`@SmartUpdate`、`@SmartDelete` 按 Mapper 方法选择性启用 |
+| 分页 | ✅&nbsp;&#x2060;可&#x2060;用 | `@SmartPage` 与 `PageResult`；应用需注册 MyBatis-Plus 分页拦截器 |
+| DTO&nbsp;/&nbsp;`Map`&nbsp;映&#x2060;射 | ✅&nbsp;&#x2060;可&#x2060;用 | 查询结果推断支持 Entity、`Map`、DTO/VO 与单结果路径 |
+| Native&nbsp;SQL&nbsp;路&#x2060;径 | ✅&nbsp;&#x2060;可&#x2060;用 | 渲染后的 SQL 占位符顺序与紧凑绑定参数列表保持一致 |
+| 固&#x2060;定&nbsp;JOIN&nbsp;声&#x2060;明 | ✅&nbsp;&#x2060;可&#x2060;用 | `@SmartJoin` 支持显式或约定推断 `ON`；当前实现基于 MPJ |
+| 写&#x2060;操&#x2060;作&#x2060;安&#x2060;全 | ✅&nbsp;&#x2060;可&#x2060;用 | 默认阻止没有有效 `WHERE` 的 Smart 更新与删除 |
+| 生&#x2060;命&#x2060;周&#x2060;期&nbsp;Hook | ✅&nbsp;&#x2060;可&#x2060;用 | `beforeSmartOperation`、`afterSmartOperation`、`onSmartException` |
+| Spring&nbsp;Boot&nbsp;Starter | 🧪&nbsp;&#x2060;快&#x2060;照&#x2060;版 | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` 已实现并通过远程验证；它会注册自己的单个内部 Mapper，同时保留应用自身的 MyBatis 基础设施与业务 Mapper 扫描。当前尚未作为稳定版本发布到 Maven Central。 |
 
 `@SmartQuery` 当前只是未启用的预留注解，不是受支持的执行入口。
 
@@ -42,7 +42,7 @@ SmartORM 是一个面向 Spring Boot 与 MyBatis-Plus 的可渐进接入、注�
 
 | 适合使用 | 建议考虑其他方案 |
 |---|---|
-| 已使用 MyBatis-Plus 的 Spring Boot 应用<br>固定 CRUD 与确定性分页<br>DTO / `Map` 投影和固定 JOIN<br>重复的 Mapper 模板 SQL<br>希望渐进、可回滚接入的团队 | 非 Spring 或响应式应用<br>高度动态或大量数据库专用 SQL<br>存储过程<br>没有维护痛点的成熟复杂 XML/Provider SQL<br>要求当前版本已经提供多数据库方言层的项目 |
+| 已使用 MyBatis-Plus 的 Spring Boot 应用；存在固定 CRUD、确定性分页、DTO / `Map` 投影、固定 JOIN 或重复 Mapper 模板 SQL；希望以渐进、可回滚的方式接入 SmartORM 的团队。 | 非 Spring 或响应式应用；高度动态或大量数据库专用 SQL；依赖存储过程；已有成熟复杂 XML / Provider SQL 且没有明显维护痛点；要求当前版本已经提供多数据库方言层的项目。 |
 
 ## 🚫 它不会替代什么
 
