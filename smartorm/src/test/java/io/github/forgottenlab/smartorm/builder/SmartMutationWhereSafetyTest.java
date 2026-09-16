@@ -119,9 +119,15 @@ class SmartMutationWhereSafetyTest {
 
         QueryWrapper<Object> wrapper = SmartWrapperBuilder.buildDeleteWrapper(meta, args);
 
-        assertEquals("(status = 0)", wrapper.getSqlSegment());
-        assertTrue(wrapper.getParamNameValuePairs().isEmpty());
-        assertEquals(0, countPlaceholders(wrapper.getSqlSegment()));
+        String sql = wrapper.getSqlSegment();
+        assertEquals(1, countPlaceholders(sql));
+        assertFalse(sql.contains("status = 0"));
+        String parameterPrefix = "#{ew.paramNameValuePairs.";
+        assertTrue(sql.contains(parameterPrefix));
+        int parameterStart = sql.indexOf(parameterPrefix) + parameterPrefix.length();
+        int parameterEnd = sql.indexOf('}', parameterStart);
+        String referencedParameter = sql.substring(parameterStart, parameterEnd);
+        assertEquals(0, wrapper.getParamNameValuePairs().get(referencedParameter));
         assertArrayEquals(new Object[]{0}, args);
     }
 
