@@ -50,7 +50,7 @@ mvn -o -pl smartorm '-Dtest=SmartQuerySupportBindingTest,SmartMutationWhereSafet
 
 当前 `.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 35 个数据库无关 core 测试与 21 个 Starter 上下文测试，启动 Compose MySQL，运行准确的 47 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
 
-Foundation SHA `c6e8c8b` 的精确 `push/main` run `31574822720` 已通过只读方式核验；它通过了当时的 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。随后，hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` 由 Draft PR #1 的 `pull_request` run `32653878401` 验证，该 run 成功完成 Starter 21/21、core 28/28、MySQL 46/46、package、报告上传与专用 Compose 资源移除。这些远程 run 早于本次参数绑定回归，不能作为当前 35/47 测试数量的远程证据。远程 workflow 没有额外执行数字式的 cleanup 后 `0/0/0` 枚举。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
+参数绑定修复合并 checkpoint `093318aa46143f052cdf54b3183b0fda80eba4da` 已由精确 `push/main` run `35074543269`（run 7、attempt 1）验证。该运行成功完成 35 个数据库无关测试、Starter 21/21、MySQL 47/47、package、Surefire 报告上传与 always-cleanup。上传的 Surefire artifact 为 `10437496726`（49,998 bytes）；cleanup 日志明确显示专用 MySQL container、volume 与 network 均已移除。远程 workflow 没有额外执行数字式的 cleanup 后 `0/0/0` 枚举。此前的 `31574822720` 与 `32653878401` 继续作为 foundation 与 Starter feature checkpoint 的历史证据保留。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
 
 ### 🧩 Starter 测试
 
@@ -117,7 +117,7 @@ docker compose -p smartorm-it-run1 -f docker-compose.test.yml down -v --remove-o
 
 测试编译、35 个数据库无关 core 回归、47 个 MySQL 测试与 21 个 Starter 测试通过后，当前 reactor 以明确跳过测试的方式完成离线 package：
 
-在专用 MySQL 环境健康后，本地 `mvn clean test` 完成 core 82/82（35 个数据库无关测试 + 47 个数据库测试）与 Starter 21/21，且无 failure、error 或 skip。该结果仅为本地证据；当前 35/47 尚无 exact-head 远程运行验证。
+在专用 MySQL 环境健康后，本地 `mvn clean test` 完成 core 82/82（35 个数据库无关测试 + 47 个数据库测试）与 Starter 21/21，且无 failure、error 或 skip。该 checkpoint workflow 也在 SHA `093318aa` 上独立验证了相同的 35 个数据库无关测试、47 个 MySQL 测试和 21 个 Starter 测试。
 
 ```powershell
 mvn -o -DskipTests package
@@ -134,7 +134,7 @@ mvn -o -DskipTests package
 
 早期 core package 验证使用隔离 Maven 缓存，外部使用方通过 2 个测试与离线复跑。当前 Starter reactor 也安装到另一个忽略的 `maven.repo.local`，其外部使用方通过 1 个测试与离线复跑。这些检查只验证本地类发布 artifact 路径；Maven Central 尚未配置、上传或实际消费。
 
-该结果不能证明位级可重复、签名、远程仓库接收或 Starter feature checkpoint 的远程 CI 成功。
+该结果不能证明位级可重复、签名、Maven Central 接收或稳定发布状态。远程精确 main CI 已在上文单独验证。
 
 ## 🛡️ 安全规则
 

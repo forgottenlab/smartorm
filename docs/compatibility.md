@@ -24,7 +24,7 @@
 | Core external consumer | isolated local Maven repository | Two tests passed online and passed again offline |
 | Starter external consumer | Boot 3.5.5, isolated local Maven repository | Real `@EnableAutoConfiguration` plus default application Mapper discovery passed 1/1 online and 1/1 offline without a database connection or internal-package reference |
 
-On 2026-09-16, a new `smartorm-parameter-binding` environment passed 47/47 and cleanup left zero project containers, networks, and volumes. An additional fixed-seed randomized class/method-order run passed all 46 database tests on 2026-07-20, and the 2026-08-12 `smartorm-release-preflight` environment passed 46/46 with zero residue. GitHub Actions run `31574822720` verified exact main SHA `c6e8c8b`: remote 28/28, MySQL 46/46, package, report upload, and cleanup all passed. Hardened Starter feature SHA `18554e6` was pushed and Draft PR #1 `pull_request` run `32653878401` completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal. Those remote runs predate the current binding regression.
+On 2026-09-16, a new `smartorm-parameter-binding` environment passed 47/47 and cleanup left zero project containers, networks, and volumes. The parameter-binding fix was then merged by PR #2 into exact main SHA `093318aa46143f052cdf54b3183b0fda80eba4da`. GitHub Actions `push/main` run `35074543269` completed successfully with 35 database-independent tests, Starter 21/21, MySQL 47/47, package, Surefire upload, and dedicated Compose resource removal. Earlier runs `31574822720` and `32653878401` remain historical evidence for prior foundation and Starter checkpoints.
 
 ## 🚫 Not Verified
 
