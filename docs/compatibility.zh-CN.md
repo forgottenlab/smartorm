@@ -18,13 +18,13 @@
 | MyBatis-Plus | 3.5.14 | 当前套件验证 Wrapper CRUD/page 行为 |
 | MyBatis-Plus-Join | 1.5.5 | 当前合并 artifact 的 JOIN 测试通过 |
 | MySQL Connector/J | 9.4.0 | 本轮与保留的可销毁集成测试均实际使用 |
-| MySQL Server | `mysql:9.4.0` tag | 本轮全新 volume 通过 46/46 并清理至 0/0/0 残留；另保留 2026-07-20 两轮独立证据 |
+| MySQL Server | `mysql:9.4.0` tag | 当前全新 volume 通过含真实绑定断言的 47/47，并清理至 0/0/0 残留；此前运行作为历史证据保留 |
 | Core artifact 集 | main/sources/Javadoc/POM | 独立测试验证后，reactor package 与 artifact 检查通过 |
 | Starter artifact | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` | 普通 JAR、imports metadata、依赖与内容已在本地检查 |
 | Core 外部使用方 | 隔离本地 Maven 仓库 | 2 个测试联网通过并再次离线复跑通过 |
 | Starter 外部使用方 | Boot 3.5.5，隔离本地 Maven 仓库 | 真实 `@EnableAutoConfiguration` 与默认应用 Mapper 发现，在无数据库连接和内部 package 引用下联网 1/1、离线 1/1 通过 |
 
-额外固定 seed 的随机类/方法顺序运行也在 2026-07-20 通过全部 46 个数据库测试。2026-08-12 release preflight 中，全新 `smartorm-release-preflight` 环境通过 46/46，清理后项目 container、network 与 volume 均为 0。随后 GitHub Actions run `31574822720` 验证了准确 main SHA `c6e8c8b`：远程 28/28、MySQL 46/46、package、报告上传与 cleanup 全部通过。Hardened Starter feature SHA `18554e6` 已 push，Draft PR #1 的 `pull_request` run `32653878401` 成功完成 Starter 21/21、core 28/28、MySQL 46/46、package、报告上传与专用 Compose 资源移除。
+2026-09-16，全新 `smartorm-parameter-binding` 环境通过 47/47，清理后项目 container、network 与 volume 均为 0。额外固定 seed 的随机类/方法顺序运行曾在 2026-07-20 通过全部 46 个数据库测试；2026-08-12 的 `smartorm-release-preflight` 环境也通过 46/46 并清理至零残留。GitHub Actions run `31574822720` 验证了准确 main SHA `c6e8c8b`：远程 28/28、MySQL 46/46、package、报告上传与 cleanup 全部通过。Hardened Starter feature SHA `18554e6` 已 push，Draft PR #1 的 `pull_request` run `32653878401` 成功完成 Starter 21/21、core 28/28、MySQL 46/46、package、报告上传与专用 Compose 资源移除。这些远程运行早于当前绑定回归。
 
 ## 🚫 未验证
 

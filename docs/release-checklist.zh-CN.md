@@ -19,12 +19,12 @@
 
 | 门禁 | 状态 | 证据 / 下一条件 |
 |---|---|---|
-| 28 个数据库无关回归 | 🧪 Locally Verified | 本轮 preflight：28/28 |
+| 35 个数据库无关回归 | 🧪 Locally Verified | 当前参数绑定 preflight：35/35 |
 | 可销毁 MySQL 9.4.0 环境 | ✅ Complete | 固定镜像、loopback 绑定、隔离 profile、项目自有 cleanup |
 | 历史全新环境双轮 | 🧪 Locally Verified | 2026-07-20：两个独立环境各 46/46 |
 | 历史随机顺序探针 | 🧪 Locally Verified | Seed `20260720`：46/46 |
-| 本轮全新 MySQL release preflight | 🧪 Locally Verified | 2026-08-12：46/46，0 failures/errors/skips，残留 0/0/0 |
-| GitHub Actions workflow 定义 | ✅ Complete | JDK 17、core 28、Starter 21、MySQL 46、package、报告上传与 always-cleanup |
+| 当前全新 MySQL 参数绑定 preflight | 🧪 Locally Verified | 2026-09-16：47/47，真实 `BoundSql` 映射，残留 0/0/0 |
+| GitHub Actions workflow 定义 | ✅ Complete | JDK 17、core 35、Starter 21、MySQL 47、package、报告上传与 always-cleanup |
 | `c6e8c8b` main workflow 结果 | ☁️ Remotely Verified | 精确 `push/main` run `31574822720` 在 Starter commits 之前通过其 release gate steps |
 | Starter feature workflow 结果 | ☁️ Remotely Verified | Draft PR #1 的 `pull_request` run `32653878401` 已针对准确 feature SHA `18554e6` 成功完成 |
 | 未来准确 release commit 复跑 | ⏳ Pending | 需要已经评审的不可变 release candidate |
@@ -59,7 +59,7 @@
 |---|---|---|
 | 2.0.x foundation checkpoints | ☁️ Remotely Verified | Main SHA `c6e8c8b` 已 push，且精确 SHA workflow 通过 |
 | Starter build/feature/docs checkpoints | ☁️ Remotely Verified | 五个精确范围 commits 已 push 至准确 feature SHA `18554e6`；Draft PR #1 CI 通过 |
-| Starter feature 远程验证 | ☁️ Remotely Verified | `pull_request` run `32653878401` 通过 Starter 21、core 28、MySQL 46、package、报告与 cleanup 门禁 |
+| Starter feature 远程验证 | ☁️ Remotely Verified | `pull_request` run `32653878401` 通过 Starter 21 及当时的 core 28/MySQL 46/package/报告/cleanup 门禁；它早于本次绑定回归 |
 | Maven Central 可用性 | ⏳ Pending | 尚无 Central Portal 发布、签名或仓库接收 |
 | Spring Boot Starter | 🧪 Locally Verified | 最小 `2.1.0-SNAPSHOT` foundation 已存在；它不属于 2.0.x release |
 | Feature branch push | ✅ Complete | 远程 feature ref 为准确 SHA `18554e6` |
@@ -69,4 +69,4 @@
 
 `STARTER_FOUNDATION_EXACT_HEAD_CI_VERIFIED`。
 
-2.0.x foundation main SHA `c6e8c8b` 已通过精确远程 workflow。2.1.x Starter foundation 与内部 Mapper hardening 已 push 至 feature SHA `18554e6`；Draft PR #1 的 `pull_request` run `32653878401` 通过 Starter 21、core 28、MySQL 46、package、报告与 cleanup 门禁。PR 仍为 Draft 且未 merge。签名/仓库设置、Maven Central 发布、tag 与 release 仍待完成；本文不声明位级可重复构建。
+2.0.x foundation main SHA `c6e8c8b` 已通过精确远程 workflow。2.1.x Starter foundation 与内部 Mapper hardening 已 push 至 feature SHA `18554e6`；Draft PR #1 的 `pull_request` run `32653878401` 通过当时的 Starter 21、core 28、MySQL 46、package、报告与 cleanup 门禁。参数绑定 35/47 checkpoint 已在本地验证，但尚无远程证据。PR 仍为 Draft 且未 merge。签名/仓库设置、Maven Central 发布、tag 与 release 仍待完成；本文不声明位级可重复构建。

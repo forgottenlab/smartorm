@@ -18,13 +18,13 @@
 | MyBatis-Plus | 3.5.14 | Wrapper CRUD/page behavior passed current suites |
 | MyBatis-Plus-Join | 1.5.5 | Current combined-artifact JOIN tests passed |
 | MySQL Connector/J | 9.4.0 | Used in the current and retained disposable integration runs |
-| MySQL Server | `mysql:9.4.0` tag | Current fresh-volume run passed 46/46 and cleaned 0/0/0 residue; two independent 2026-07-20 runs are retained evidence |
+| MySQL Server | `mysql:9.4.0` tag | Current fresh-volume run passed 47/47 with real binding assertions and cleaned 0/0/0 residue; earlier runs are retained evidence |
 | Core artifact set | main/sources/Javadoc/POM | Reactor package and artifact inspection passed after separate test validation |
 | Starter artifact | `smartorm-spring-boot-starter:2.1.0-SNAPSHOT` | Ordinary JAR, imports metadata, dependencies, and contents inspected locally |
 | Core external consumer | isolated local Maven repository | Two tests passed online and passed again offline |
 | Starter external consumer | Boot 3.5.5, isolated local Maven repository | Real `@EnableAutoConfiguration` plus default application Mapper discovery passed 1/1 online and 1/1 offline without a database connection or internal-package reference |
 
-An additional fixed-seed randomized class/method-order run passed all 46 database tests on 2026-07-20. In the 2026-08-12 release preflight, a new `smartorm-release-preflight` environment passed 46/46 and cleanup left zero project containers, networks, and volumes. GitHub Actions run `31574822720` then verified exact main SHA `c6e8c8b`: remote 28/28, MySQL 46/46, package, report upload, and cleanup all passed. Hardened Starter feature SHA `18554e6` was pushed and Draft PR #1 `pull_request` run `32653878401` completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal.
+On 2026-09-16, a new `smartorm-parameter-binding` environment passed 47/47 and cleanup left zero project containers, networks, and volumes. An additional fixed-seed randomized class/method-order run passed all 46 database tests on 2026-07-20, and the 2026-08-12 `smartorm-release-preflight` environment passed 46/46 with zero residue. GitHub Actions run `31574822720` verified exact main SHA `c6e8c8b`: remote 28/28, MySQL 46/46, package, report upload, and cleanup all passed. Hardened Starter feature SHA `18554e6` was pushed and Draft PR #1 `pull_request` run `32653878401` completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal. Those remote runs predate the current binding regression.
 
 ## 🚫 Not Verified
 

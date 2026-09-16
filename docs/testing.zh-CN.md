@@ -23,19 +23,19 @@ mvn -o test-compile
 
 ### 🧪 数据库无关回归测试
 
-当前 28 个测试无需 Spring Boot、MySQL、网络服务或测试顺序，直接覆盖 Native SQL 渲染/绑定与空 `WHERE` 写操作安全：
+当前 35 个测试无需 Spring Boot、MySQL、网络服务或测试顺序，直接覆盖无 JOIN Wrapper 参数绑定、Native SQL 渲染/绑定与空 `WHERE` 写操作安全：
 
 ```powershell
-mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
+mvn -o -pl smartorm '-Dtest=SmartQuerySupportBindingTest,SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
 ```
 
-覆盖范围包括正常/乱序/稀疏/重复占位符、显式/推断 JOIN 谓词、别名、分页渲染、越界参数、空/禁用写谓词、显式全表 opt-in 和输入不可变性。
+覆盖范围包括绑定的整数/String/null 值、多参数/乱序/稀疏/重复占位符、无 JOIN Handler 边界、显式/推断 JOIN 谓词、别名、分页渲染、越界参数、空/禁用写谓词、显式全表 opt-in 和输入不可变性。
 
 ### 🐬 MySQL 集成测试
 
-当前 9 个 Spring Boot 测试类执行 46 个测试，覆盖查询、结果映射、插入、更新、删除、分页、JOIN、`SmartMapper` 辅助方法和生命周期 Hook。每个类都使用 `test` profile 和事务回滚。
+当前 9 个 Spring Boot 测试类执行 47 个测试，覆盖查询、结果映射、插入、更新、删除、分页、JOIN、`SmartMapper` 辅助方法和生命周期 Hook。每个类都使用 `test` profile 和事务回滚。
 
-本轮 2026-08-12 preflight 使用用户手动启动后的 Docker Desktop Linux daemon，并创建全新的 `smartorm-release-preflight` Compose 项目。46 个测试全部通过，0 failure、0 error、0 skip；强制 cleanup 后项目 container、network 与 volume 均为 0。2026-07-20 双轮与随机顺序探针仍作为独立历史证据保留。
+2026-09-16 参数绑定 preflight 在 MySQL 9.4.0 上创建了全新的 `smartorm-parameter-binding` Compose 项目。47 个测试全部通过，0 failure、0 error、0 skip；新增测试针对已存在 ID、缺失 ID 和 String 值查询检查了真实 MyBatis `BoundSql`。强制 cleanup 后项目 container、network 与 volume 均为 0。2026-08-12 preflight 以及 2026-07-20 双轮/随机顺序探针仍作为独立历史证据保留。
 
 集成环境由 `docker-compose.test.yml` 定义：
 
@@ -48,9 +48,9 @@ mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererT
 
 ### ☁️ CI 验证
 
-当前 `.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 28 个数据库无关 core 测试与 21 个 Starter 上下文测试，启动 Compose MySQL，运行准确的 46 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
+当前 `.github/workflows/test.yml` 选择 JDK 17，启用 Maven 依赖缓存，编译测试，运行 35 个数据库无关 core 测试与 21 个 Starter 上下文测试，启动 Compose MySQL，运行准确的 47 个数据库测试，不重复测试地执行 package，上传 Surefire 报告，并定义 `if: always()` cleanup 步骤。
 
-Foundation SHA `c6e8c8b` 的精确 `push/main` run `31574822720` 已通过只读方式核验；它通过了 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。随后，hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` 由 Draft PR #1 的 `pull_request` run `32653878401` 验证，该 run 成功完成 Starter 21/21、core 28/28、MySQL 46/46、package、报告上传与专用 Compose 资源移除。远程 workflow 没有额外执行数字式的 cleanup 后 `0/0/0` 枚举。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
+Foundation SHA `c6e8c8b` 的精确 `push/main` run `31574822720` 已通过只读方式核验；它通过了当时的 28 个数据库无关测试、46 个 MySQL 测试、package、Surefire 上传与 always-cleanup 步骤。随后，hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` 由 Draft PR #1 的 `pull_request` run `32653878401` 验证，该 run 成功完成 Starter 21/21、core 28/28、MySQL 46/46、package、报告上传与专用 Compose 资源移除。这些远程 run 早于本次参数绑定回归，不能作为当前 35/47 测试数量的远程证据。远程 workflow 没有额外执行数字式的 cleanup 后 `0/0/0` 枚举。Runner OS/工具版本、Action major tag、MySQL image tag 与 Docker Compose 并未作为整体固定到不可变 digest，因此这不构成位级可重复声明。README badge 表示实时 workflow 状态，不能替代精确 SHA 证据。
 
 ### 🧩 Starter 测试
 
@@ -105,16 +105,19 @@ docker compose -p smartorm-it-run1 -f docker-compose.test.yml down -v --remove-o
 
 | 运行 | 测试数 | 结果 | 清理 |
 |---|---:|---|---|
-| 本轮 release preflight，2026-08-12 | 46 | 46 passed，0 failures/errors/skips | 项目 container/volume/network 均为 0 |
+| 参数绑定 preflight，2026-09-16 | 47 | 47 passed，0 failures/errors/skips | 项目 container/volume/network 均为 0 |
+| release preflight，2026-08-12 | 46 | 46 passed，0 failures/errors/skips | 项目 container/volume/network 均为 0 |
 | `smartorm-it-run1` | 46 | 46 passed，0 failures/errors/skips | 项目 container/volume/network 均为 0 |
 | `smartorm-it-run2` | 46 | 46 passed，0 failures/errors/skips | 项目 container/volume/network 均为 0 |
 | 随机顺序，seed `20260720` | 46 | 46 passed，0 failures/errors/skips | 项目 container/volume/network 均为 0 |
 
-第一行属于本轮 preflight 证据，后三行属于 2026-07-20 保留的历史证据。它们共同只验证实际测试的 MySQL 9.4.0 组合，不能证明其他数据库或框架版本。
+第一行属于当前 preflight 证据；2026-08-12 一行和 2026-07-20 三行属于保留的历史证据。它们共同只验证实际测试的 MySQL 9.4.0 组合，不能证明其他数据库或框架版本。
 
 ## 📦 Artifact Preflight
 
-测试编译、28 个 core 回归与 21 个 Starter 测试另行通过后，当前 reactor 以明确跳过测试的方式完成离线 package：
+测试编译、35 个数据库无关 core 回归、47 个 MySQL 测试与 21 个 Starter 测试通过后，当前 reactor 以明确跳过测试的方式完成离线 package：
+
+在专用 MySQL 环境健康后，本地 `mvn clean test` 完成 core 82/82（35 个数据库无关测试 + 47 个数据库测试）与 Starter 21/21，且无 failure、error 或 skip。该结果仅为本地证据；当前 35/47 尚无 exact-head 远程运行验证。
 
 ```powershell
 mvn -o -DskipTests package

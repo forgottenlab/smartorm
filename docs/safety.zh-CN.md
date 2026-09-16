@@ -75,7 +75,8 @@ int deleteEveryRow();
 运行时方法参数使用 `#{0}` 这样的数字占位符。当前路径存在差异：
 
 - Native/JOIN Renderer 会把占位符转换为有序 MyBatis 参数绑定。
-- Wrapper 路径目前会通过 `SmartExpressionUtil.fillExpression` 渲染转义后的标量字面量，再用于 Wrapper `apply`/表达式 `setSql`。
+- 无 JOIN 的 `@SmartSelect` 以及共用 WHERE 构建器的 `@SmartPage`/`@SmartDelete` 会把数字方法参数占位符转换为紧凑的 MyBatis-Plus `Wrapper.apply` 绑定。String、null 等运行时值保留在 Wrapper 参数状态中；重复下标复用同一逻辑绑定。
+- `@SmartUpdate` 仍使用独立的 WHERE 实现，表达式形式的 `setSql` 值也仍通过 `SmartExpressionUtil.fillExpression` 处理。普通非表达式 SET 值继续使用 Wrapper 绑定。
 
 因此，不应宣称当前所有路径具有完全一致的 prepared-statement 绑定语义。请保持注解结构静态，在应用边界验证输入，并为引号、null、顺序和数据库副作用增加回归测试。
 
@@ -103,6 +104,6 @@ int deleteEveryRow();
 
 ## 回归证据
 
-`SmartMutationWhereSafetyTest` 包含 18 个数据库无关测试，覆盖空白/纯空格/`WHERE` 空壳、运行时禁用谓词、有效谓词、Handler 拒绝、显式 opt-in、参数顺序和输入不可变性。数据库套件还会使用可销毁 MySQL 9.4.0 验证注解更新/删除行为。
+`SmartQuerySupportBindingTest` 包含 7 个数据库无关测试，覆盖整数、String、多参数、重复、稀疏/乱序、null、输入不可变性，以及使用真实 MyBatis-Plus Wrapper 状态的无 JOIN Handler 边界。`SmartMutationWhereSafetyTest` 保留 18 个写操作安全测试。数据库套件还会使用可销毁 MySQL 9.4.0 验证实际执行和最终 MyBatis `BoundSql` 参数映射。
 
 准确证据与命令见[测试](testing.zh-CN.md)。

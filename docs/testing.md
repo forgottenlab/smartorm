@@ -23,19 +23,19 @@ mvn -o test-compile
 
 ### 🧪 Database-Independent Regression Tests
 
-The current 28-test set directly exercises native SQL rendering/binding and empty-`WHERE` mutation safety without Spring Boot, MySQL, network services, or test order dependencies:
+The current 35-test set directly exercises non-JOIN Wrapper binding, native SQL rendering/binding, and empty-`WHERE` mutation safety without Spring Boot, MySQL, network services, or test order dependencies:
 
 ```powershell
-mvn -o -pl smartorm '-Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
+mvn -o -pl smartorm '-Dtest=SmartQuerySupportBindingTest,SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest' test
 ```
 
-Coverage includes sequential/out-of-order/sparse/repeated placeholders, explicit/inferred JOIN predicates, aliases, pagination rendering, invalid indices, empty/disabled mutation predicates, explicit full-table opt-in, and input immutability.
+Coverage includes bound integer/String/null values, multiple/out-of-order/sparse/repeated placeholders, the non-JOIN Handler boundary, explicit/inferred JOIN predicates, aliases, pagination rendering, invalid indices, empty/disabled mutation predicates, explicit full-table opt-in, and input immutability.
 
 ### 🐬 MySQL Integration Tests
 
-Nine Spring Boot test classes currently execute 46 tests for select, result mapping, insert, update, delete, pagination, JOIN, `SmartMapper` helpers, and lifecycle hooks. Every class uses the `test` profile and transaction rollback.
+Nine Spring Boot test classes currently execute 47 tests for select, result mapping, insert, update, delete, pagination, JOIN, `SmartMapper` helpers, and lifecycle hooks. Every class uses the `test` profile and transaction rollback.
 
-The current 2026-08-12 preflight used the user-started Docker Desktop Linux daemon and a new `smartorm-release-preflight` Compose project. All 46 tests passed with no failure, error, or skip. Mandatory cleanup then left zero project containers, networks, and volumes. The dated 2026-07-20 double-run and random-order probe remain separate historical evidence.
+The 2026-09-16 parameter-binding preflight created a new `smartorm-parameter-binding` Compose project on MySQL 9.4.0. All 47 tests passed with no failure, error, or skip; the new test inspected real MyBatis `BoundSql` for existing-ID, missing-ID, and String-valued queries. Mandatory cleanup then left zero project containers, networks, and volumes. The 2026-08-12 preflight and dated 2026-07-20 double-run/random-order probe remain separate historical evidence.
 
 The integration environment is defined by `docker-compose.test.yml`:
 
@@ -48,9 +48,9 @@ The integration environment is defined by `docker-compose.test.yml`:
 
 ### ☁️ CI Verification
 
-The current `.github/workflows/test.yml` selects JDK 17, enables Maven dependency caching, compiles tests, runs the 28 database-independent core tests and 21 Starter context tests, starts the Compose MySQL service, runs the exact 46 database tests, packages without rerunning tests, uploads Surefire reports, and defines an `if: always()` cleanup step.
+The current `.github/workflows/test.yml` selects JDK 17, enables Maven dependency caching, compiles tests, runs the 35 database-independent core tests and 21 Starter context tests, starts the Compose MySQL service, runs the exact 47 database tests, packages without rerunning tests, uploads Surefire reports, and defines an `if: always()` cleanup step.
 
-The exact `push/main` run for Foundation SHA `c6e8c8b` was inspected read-only as run `31574822720`; it passed the 28 database-independent tests, 46 MySQL tests, package, Surefire upload, and always-cleanup steps. Hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` was then verified by Draft PR #1 `pull_request` run `32653878401`, which completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal. The remote workflow does not perform a separate numeric post-cleanup `0/0/0` enumeration. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
+The exact `push/main` run for Foundation SHA `c6e8c8b` was inspected read-only as run `31574822720`; it passed the then-current 28 database-independent tests, 46 MySQL tests, package, Surefire upload, and always-cleanup steps. Hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` was then verified by Draft PR #1 `pull_request` run `32653878401`, which completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal. Those remote runs predate the parameter-binding regression and do not verify the current 35/47 counts. The remote workflow does not perform a separate numeric post-cleanup `0/0/0` enumeration. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
 
 ### 🧩 Starter Tests
 
@@ -105,16 +105,19 @@ The retained local evidence from 2026-07-20 is:
 
 | Run | Tests | Result | Cleanup |
 |---|---:|---|---|
-| current release preflight, 2026-08-12 | 46 | 46 passed, 0 failures/errors/skips | 0 project containers/volumes/networks |
+| parameter-binding preflight, 2026-09-16 | 47 | 47 passed, 0 failures/errors/skips | 0 project containers/volumes/networks |
+| release preflight, 2026-08-12 | 46 | 46 passed, 0 failures/errors/skips | 0 project containers/volumes/networks |
 | `smartorm-it-run1` | 46 | 46 passed, 0 failures/errors/skips | 0 project containers/volumes/networks |
 | `smartorm-it-run2` | 46 | 46 passed, 0 failures/errors/skips | 0 project containers/volumes/networks |
 | randomized order, seed `20260720` | 46 | 46 passed, 0 failures/errors/skips | 0 project containers/volumes/networks |
 
-The first row is current-preflight evidence. The three 2026-07-20 rows are retained historical evidence. Together they verify only the tested MySQL 9.4.0 point, not other database/framework versions.
+The first row is current-preflight evidence. The 2026-08-12 row and three 2026-07-20 rows are retained historical evidence. Together they verify only the tested MySQL 9.4.0 point, not other database/framework versions.
 
 ## 📦 Artifact Preflight
 
-After test compilation, the 28 core regressions, and the 21 Starter tests passed separately, the current reactor completed an offline package with tests intentionally skipped:
+After test compilation, the 35 database-independent core regressions, 47 MySQL tests, and 21 Starter tests passed, the current reactor completed an offline package with tests intentionally skipped:
+
+With the dedicated MySQL environment healthy, local `mvn clean test` completed 82/82 core tests (35 database-independent plus 47 database-backed) and 21/21 Starter tests, with no failures, errors, or skips. This is local evidence; no exact-head remote run has verified the current 35/47 counts.
 
 ```powershell
 mvn -o -DskipTests package
