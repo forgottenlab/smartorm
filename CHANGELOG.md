@@ -33,7 +33,7 @@
 - 修复无 JOIN `@SmartSelect.where`（以及共享构建器的 `@SmartPage` / `@SmartDelete` WHERE）把运行时参数渲染为 SQL 字面量的问题；公开 `#{n}` 语法保持不变，运行时值改由 MyBatis-Plus Wrapper 参数绑定。`@SmartUpdate` 的独立路径不在本次变更内。
 
 ### Notes
-- `2.1.0-SNAPSHOT` Starter 仍是未在 Maven Central 发布的开发 foundation；hardened feature SHA `18554e6` 已 push，Draft PR #1 的 `pull_request` run `32653878401` 已成功完成，但 PR 尚未 merge，也没有 tag 或 release。
+- `2.1.0-SNAPSHOT` Starter 仍是未在 Maven Central 发布的开发 foundation；Starter foundation 已通过 PR #1 合并，参数绑定修复已通过 PR #2 合并。参数绑定修复合并 checkpoint SHA `093318aa` 的 `push/main` run `35074543269` 已通过 core 35、Starter 21、MySQL 47、package、报告上传与 cleanup；仍没有 tag、GitHub Release 或 Maven Central 发布。
 - 本轮没有实现配置属性/元数据、Validator、Doctor、FailureAnalyzer 或 3.0 语义模块拆分。
 
 ## [2.0.0] - 2026-04-22

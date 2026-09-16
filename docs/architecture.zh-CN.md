@@ -88,7 +88,7 @@ Starter 不扫描 SmartORM component 或应用 Mapper package。应用只扫描�
 - 由于 `SmartMapper` 暴露 `MPJBaseMapper`，MyBatis-Plus-Join 仍保持传递依赖。
 - JSqlParser 为 optional；Spring Web 与 MySQL Connector/J 为 runtime + optional，不再是使用方必须继承的传递依赖。
 - Demo 代码与运行集成仍和 core 语义位于 `smartorm` 子模块，但 demo class/configuration/SQL 已从发布 artifacts 排除。
-- 本地安装的 core artifact 保留既有外部使用方 2 个 smoke tests 证据。开发版 Starter 另外通过 1 个外部 Spring Boot 使用方 smoke 及离线复跑；Maven Central 消费与真实项目接入仍未验证。
+- 本地安装的 core artifact 保留既有外部使用方 2 个 smoke tests 证据。开发版 Starter 另外通过 1 个外部 Spring Boot 使用方 smoke 及离线复跑。参数绑定修复合并 checkpoint `093318aa` 已由 `push/main` run `35074543269` 远程验证；Maven Central 消费与完成真实项目接入仍未验证。
 - `SmartQuery` 是公开但未启用的注解。
 - Wrapper 与 Native 路径没有完全相同的标量绑定实现。
 
@@ -98,7 +98,7 @@ Starter 不扫描 SmartORM component 或应用 Mapper package。应用只扫描�
 
 路线图现在区分已在本地实现的 Starter foundation 与剩余产品工作：
 
-- 2.1.x：远程验证 Starter foundation，为单个真实项目模块制定接入计划，再独立设计配置、校验与诊断。
+- 2.1.x：保持已合并且远程验证的 Starter foundation 稳定，完成一个有边界的真实项目接入证明，再独立设计配置、校验与诊断。
 - 2.2.x：完成兼容性设计后的聚焦 API 易用性改进。
 - 3.0：物理拆分 core/Spring/JOIN/demo，并建立 `SmartMapper`/`SmartJoinMapper` 边界。
 

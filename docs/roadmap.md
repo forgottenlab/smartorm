@@ -21,7 +21,7 @@ Current evidence:
 - The current 2026-09-16 fresh MySQL 9.4.0 parameter-binding preflight passes 47/47 and cleans container/network/volume state to 0/0/0.
 - Two independent 2026-07-20 MySQL runs and one fixed-seed randomized-order run remain historical evidence.
 - An ordinary main JAR, sources, Javadoc, standalone license, isolated install, and external consumer smoke are locally verified.
-- The exact GitHub Actions `push/main` run `31574822720` for Foundation SHA `c6e8c8b` passed the then-current 28-test, MySQL 46-test, package, report, and cleanup gates; current 35/47 evidence is local-only.
+- Exact merged-main SHA `093318aa` passed GitHub Actions `push/main` run `35074543269` with core 35 database-independent tests, Starter 21/21, MySQL 47/47, package, report upload, and cleanup.
 - Signing/repository setup, Maven Central publication, tag, and release remain open.
 
 ## 🚀 In Progress — 2.1.x Adoption Experience
@@ -33,8 +33,9 @@ Implemented and verified locally and by exact-head pull-request CI in the curren
 - late precise registration of one internal `SmartNativeMapper`, while application business Mapper discovery and MyBatis/database/transaction infrastructure remain application-owned;
 - 21 database-free auto-configuration tests and an isolated default-scanning Spring Boot consumer test, including an offline repeat;
 - full core regression and disposable MySQL checks after the topology change.
-- pushed feature SHA `18554e6` and successful Draft PR #1 `pull_request` run `32653878401`;
-- a read-only Lingxi audit that selected one reversible `user-service` Mapper method as the proposed pilot scope.
+- Starter foundation merged through PR #1, followed by PR #2 for the non-JOIN parameter-binding repair;
+- exact merged-main SHA `093318aa` verified by `push/main` run `35074543269`;
+- a read-only Lingxi audit that selected one reversible `user-service` Mapper method as the proposed pilot scope; the initial pilot exposed the parameter-binding gap, which is now fixed on `main`, while real-project equivalence testing remains separately gated.
 
 Still gated by separately approved work:
 

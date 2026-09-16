@@ -21,7 +21,7 @@
 - 当前 2026-09-16 全新 MySQL 9.4.0 参数绑定 preflight 通过 47/47，并把 container/network/volume 清理至 0/0/0。
 - 2026-07-20 两个独立 MySQL 运行与一轮固定 seed 随机顺序运行作为历史证据保留。
 - 普通主 JAR、sources、Javadoc、独立许可证、隔离 install 与外部使用方 smoke 已在本地验证。
-- Foundation SHA `c6e8c8b` 的精确 GitHub Actions `push/main` 运行 `31574822720` 已通过当时的 28 测试、MySQL 46 测试、package、报告与 cleanup 门禁；当前 35/47 只有本地证据。
+- 精确合并后 main SHA `093318aa` 已通过 GitHub Actions `push/main` run `35074543269`，覆盖 core 35 个数据库无关测试、Starter 21/21、MySQL 47/47、package、报告上传与 cleanup。
 - 签名/仓库设置、Maven Central 发布、tag 与 release 仍待完成。
 
 ## 🚀 In Progress — 2.1.x 接入体验
@@ -33,8 +33,9 @@
 - 延迟精确注册一个内部 `SmartNativeMapper`，应用继续拥有业务 Mapper 发现与 MyBatis/数据库/事务基础设施；
 - 21 个数据库无关自动配置测试，以及包含离线复跑和默认业务 Mapper 扫描的隔离外部 Spring Boot 使用方测试；
 - 拓扑变更后完整的 core 回归与可销毁 MySQL 检查。
-- 已 push 的 feature SHA `18554e6` 与成功的 Draft PR #1 `pull_request` run `32653878401`；
-- 已完成只读 Lingxi 审计，并选择一个可回滚的 `user-service` Mapper 方法作为拟议 pilot 范围。
+- Starter foundation 已通过 PR #1 合并，随后 PR #2 合并无 JOIN 参数绑定修复；
+- 精确合并后 main SHA `093318aa` 已由 `push/main` run `35074543269` 验证；
+- 已完成只读 Lingxi 审计，并选择一个可回滚的 `user-service` Mapper 方法作为拟议 pilot 范围；首次 pilot 暴露出的参数绑定缺口现已在 `main` 修复，但真实项目行为等价验证仍需单独门禁。
 
 仍需通过单独获批任务完成：
 

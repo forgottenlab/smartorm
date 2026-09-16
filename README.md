@@ -21,7 +21,7 @@ SmartORM is an opt-in, annotation-driven enhancement library for MyBatis-Plus ap
 It removes repetitive, fixed-shape Mapper code while preserving the MyBatis-Plus programming model and its escape hatches. Adoption is incremental: choose one Mapper and one method, keep existing paths beside it, and roll back without redesigning the application.
 
 > [!NOTE]
-> SmartORM 2.0.x remains the verified release foundation. The current 2.1.x development line adds a locally installable Spring Boot Starter, but neither artifact has been published to Maven Central.
+> SmartORM 2.0.x remains the verified release foundation. The current 2.1.x development line on `main` adds a locally installable Spring Boot Starter, but neither artifact has been published to Maven Central.
 
 ## 🚀 What It Provides
 
@@ -106,9 +106,9 @@ Run the test gates separately before relying on `-DskipTests`; the command above
 ## 🛡️ Safe by Default
 
 > [!WARNING]
-> Full-table SmartORM updates and deletes are blocked by default. Native/JOIN runtime scalar values use ordered parameter bindings, while SQL structure remains developer-authored metadata. An intentional full-table operation requires method-level `allowFullTable = true`; there is no global switch that disables this guard.
+> Full-table SmartORM updates and deletes are blocked by default. Native/JOIN runtime scalar values use ordered parameter bindings, while non-JOIN `@SmartSelect` and the shared `@SmartPage` / `@SmartDelete` WHERE path keep runtime values in MyBatis-Plus Wrapper parameter state. SQL structure remains developer-authored metadata. An intentional full-table operation requires method-level `allowFullTable = true`; there is no global switch that disables this guard.
 
-The opt-in bypasses only the missing-effective-`WHERE` refusal. It does not add authorization, transactions, rollback, input validation, or database protection. SmartORM does not claim universal SQL-injection prevention; keep structural fragments static and review the exact [Safety](docs/safety.md) boundary.
+The opt-in bypasses only the missing-effective-`WHERE` refusal. It does not add authorization, transactions, rollback, input validation, or database protection. SmartORM does not claim universal SQL-injection prevention; keep structural fragments static and review the exact [Safety](docs/safety.md) boundary, including the separate current `@SmartUpdate` expression path.
 
 ## 🧪 Verified Testing
 
@@ -122,9 +122,9 @@ The opt-in bypasses only the missing-effective-`WHERE` refusal. It does not add 
 | Current parameter-binding MySQL preflight | Fresh `smartorm-parameter-binding` Compose project | 2026-09-16: 47/47; real `BoundSql` mappings verified; residue 0/0/0 |
 | Historical MySQL release preflight | Fresh `smartorm-release-preflight` Compose project | 2026-08-12: 46/46; 0 failures/errors/skips; residue 0/0/0 |
 | Starter hardening MySQL regression | Fresh `smartorm-starter-mapper-hardening` Compose project | 2026-08-13: 46/46; cleanup residue 0/0/0 |
-| Last exact remote evidence | JDK 17, Starter 21, then-current core 28 and MySQL 46, package, reports, cleanup | Foundation SHA `c6e8c8b`: exact `push/main` run `31574822720` passed; Starter SHA `18554e6`: Draft PR #1 `pull_request` run `32653878401` completed successfully; current 35/47 counts remain local-only |
+| Parameter-binding merge checkpoint CI | JDK 17, core 35, Starter 21, MySQL 47, package, reports, cleanup | Checkpoint SHA `093318aa`: exact `push/main` run `35074543269` passed; Surefire artifact `10437496726`; Compose container, volume, and network were removed |
 
-Compilation, package, and artifact checks are also part of the local release preflight. Each layer proves a different boundary; historical runs are not presented as current evidence. See [Testing](docs/testing.md).
+Compilation, package, and artifact checks are also part of the local release preflight. The parameter-binding merge checkpoint workflow remotely verified the 35/21/47 test split at SHA `093318aa`; historical runs remain evidence for earlier checkpoints. See [Testing](docs/testing.md).
 
 ## 🧱 Architecture at a Glance
 
@@ -165,4 +165,4 @@ Focused issues and pull requests are welcome. Please include the compatibility p
 
 ## 📜 License
 
-SmartORM is licensed under the [Apache License 2.0](LICENSE). No release, tag, Maven Central publication, or GitHub Release is implied by the current local preflight.
+SmartORM is licensed under the [Apache License 2.0](LICENSE). Current development-line verification does not imply a release, tag, Maven Central publication, or GitHub Release.

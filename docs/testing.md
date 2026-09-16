@@ -50,7 +50,7 @@ The integration environment is defined by `docker-compose.test.yml`:
 
 The current `.github/workflows/test.yml` selects JDK 17, enables Maven dependency caching, compiles tests, runs the 35 database-independent core tests and 21 Starter context tests, starts the Compose MySQL service, runs the exact 47 database tests, packages without rerunning tests, uploads Surefire reports, and defines an `if: always()` cleanup step.
 
-The exact `push/main` run for Foundation SHA `c6e8c8b` was inspected read-only as run `31574822720`; it passed the then-current 28 database-independent tests, 46 MySQL tests, package, Surefire upload, and always-cleanup steps. Hardened Starter feature SHA `18554e6bb5528fb570e20227969a7b5d863c1e74` was then verified by Draft PR #1 `pull_request` run `32653878401`, which completed successfully with Starter 21/21, core 28/28, MySQL 46/46, package, report upload, and dedicated Compose resource removal. Those remote runs predate the parameter-binding regression and do not verify the current 35/47 counts. The remote workflow does not perform a separate numeric post-cleanup `0/0/0` enumeration. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
+The parameter-binding merge checkpoint `093318aa46143f052cdf54b3183b0fda80eba4da` was verified by exact `push/main` run `35074543269` (run 7, attempt 1). It completed successfully with the 35 database-independent tests, Starter 21/21, MySQL 47/47, package, Surefire report upload, and always-cleanup. The uploaded Surefire artifact is `10437496726` (49,998 bytes); cleanup logs show the dedicated MySQL container, volume, and network were each removed. The workflow does not perform a separate numeric post-cleanup `0/0/0` enumeration. Earlier runs `31574822720` and `32653878401` remain historical evidence for the foundation and Starter feature checkpoints. Runner OS/tool versions, action major tags, the MySQL image tag, and Docker Compose are not pinned to immutable digests as a group, so this is not a bit-for-bit reproducibility claim. The README badge shows live workflow status and does not replace exact-SHA evidence.
 
 ### 🧩 Starter Tests
 
@@ -117,7 +117,7 @@ The first row is current-preflight evidence. The 2026-08-12 row and three 2026-0
 
 After test compilation, the 35 database-independent core regressions, 47 MySQL tests, and 21 Starter tests passed, the current reactor completed an offline package with tests intentionally skipped:
 
-With the dedicated MySQL environment healthy, local `mvn clean test` completed 82/82 core tests (35 database-independent plus 47 database-backed) and 21/21 Starter tests, with no failures, errors, or skips. This is local evidence; no exact-head remote run has verified the current 35/47 counts.
+With the dedicated MySQL environment healthy, local `mvn clean test` completed 82/82 core tests (35 database-independent plus 47 database-backed) and 21/21 Starter tests, with no failures, errors, or skips. That checkpoint workflow independently verified the same 35 database-independent, 47 MySQL, and 21 Starter counts at SHA `093318aa`.
 
 ```powershell
 mvn -o -DskipTests package
@@ -134,7 +134,7 @@ The following outputs were generated and inspected:
 
 The earlier core package validation used an isolated Maven cache and its external consumer passed two tests plus an offline repeat. The current Starter reactor was also installed into a separate ignored `maven.repo.local`; its external consumer passed one test plus an offline repeat. These checks validate local published-like artifact paths only; Maven Central has not been configured, uploaded to, or consumed from.
 
-This result does not establish bit-for-bit reproducibility, signing, remote repository acceptance, or remote CI success for the Starter feature checkpoint.
+This result does not establish bit-for-bit reproducibility, signing, Maven Central acceptance, or stable-release status. Remote exact-main CI is verified separately above.
 
 ## 🛡️ Safety Rules
 

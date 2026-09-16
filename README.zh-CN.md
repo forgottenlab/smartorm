@@ -21,7 +21,7 @@ SmartORM 是一个面向 Spring Boot 与 MyBatis-Plus 的可渐进接入、注�
 它用于减少固定形态的重复 Mapper 代码，同时保留 MyBatis-Plus 的编程模型与原有扩展路径。接入过程可以渐进完成：先选择一个 Mapper、一个方法，保留原实现并行对照，需要时也能回滚，而不必重构整个应用。
 
 > [!NOTE]
-> SmartORM 2.0.x 仍是已验证的发布基础。当前 2.1.x 开发线已增加可本地安装的 Spring Boot Starter，但两个 artifact 都尚未发布到 Maven Central。
+> SmartORM 2.0.x 仍是已验证的发布基础。当前 `main` 上的 2.1.x 开发线已增加可本地安装的 Spring Boot Starter，但两个 artifact 都尚未发布到 Maven Central。
 
 ## 🚀 当前能力
 
@@ -106,9 +106,9 @@ Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再�
 ## 🛡️ 默认安全
 
 > [!WARNING]
-> SmartORM 默认阻止全表更新和删除。Native/JOIN 路径的运行时标量值按顺序绑定，SQL 结构则来自开发者声明的元数据。有意执行全表操作时，必须在方法级显式设置 `allowFullTable = true`；不存在全局关闭该保护的开关。
+> SmartORM 默认阻止全表更新和删除。Native/JOIN 路径的运行时标量值按顺序绑定；无 JOIN `@SmartSelect` 以及共享的 `@SmartPage` / `@SmartDelete` WHERE 路径会把运行时值保留在 MyBatis-Plus Wrapper 参数状态中。SQL 结构仍来自开发者声明的元数据。有意执行全表操作时，必须在方法级显式设置 `allowFullTable = true`；不存在全局关闭该保护的开关。
 
-该 opt-in 只绕过“缺少有效 `WHERE`”拒绝逻辑，不会补充授权、事务、回滚、输入校验或数据库保护。SmartORM 不宣称能够普遍杜绝 SQL 注入；结构片段必须保持静态，并按[安全指南](docs/safety.zh-CN.md)评审真实边界。
+该 opt-in 只绕过“缺少有效 `WHERE`”拒绝逻辑，不会补充授权、事务、回滚、输入校验或数据库保护。SmartORM 不宣称能够普遍杜绝 SQL 注入；结构片段必须保持静态，并按[安全指南](docs/safety.zh-CN.md)评审真实边界，包括当前仍采用独立表达式路径的 `@SmartUpdate`。
 
 ## 🧪 已验证测试
 
@@ -122,9 +122,9 @@ Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再�
 | 当前参数绑定 MySQL preflight | 全新 `smartorm-parameter-binding` Compose 项目 | 2026-09-16：47/47；真实 `BoundSql` 映射已验证；残留 0/0/0 |
 | 历史 MySQL release preflight | 全新 `smartorm-release-preflight` Compose 项目 | 2026-08-12：46/46；0 failures/errors/skips；残留 0/0/0 |
 | Starter hardening MySQL 回归 | 全新 `smartorm-starter-mapper-hardening` Compose 项目 | 2026-08-13：46/46；cleanup 残留 0/0/0 |
-| 最近的精确远程证据 | JDK 17、Starter 21、当时的 core 28 与 MySQL 46、package、报告与 cleanup | Foundation SHA `c6e8c8b`：精确 `push/main` run `31574822720` 通过；Starter SHA `18554e6`：Draft PR #1 的 `pull_request` run `32653878401` 成功完成；当前 35/47 数量仅有本地证据 |
+| 参数绑定修复合并 checkpoint CI | JDK 17、core 35、Starter 21、MySQL 47、package、报告与 cleanup | Checkpoint SHA `093318aa`：精确 `push/main` run `35074543269` 通过；Surefire artifact `10437496726`；Compose container、volume、network 均已移除 |
 
-本地 preflight 还包含编译、package 与 artifact 检查。各层证据证明的边界不同，历史运行不会被当成本轮结果。详见[测试](docs/testing.zh-CN.md)。
+本地 preflight 还包含编译、package 与 artifact 检查。参数绑定修复合并 checkpoint workflow 已在 SHA `093318aa` 上远程验证 35/21/47 测试分层；历史运行仅作为此前 checkpoint 的证据保留。详见[测试](docs/testing.zh-CN.md)。
 
 ## 🧱 架构概览
 
@@ -165,4 +165,4 @@ SmartORM 现在使用包含 `smartorm` 与合并式 `smartorm-spring-boot-starte
 
 ## 📜 许可证
 
-SmartORM 使用 [Apache License 2.0](LICENSE)。当前本地 preflight 不代表已经完成 release、tag、Maven Central 发布或 GitHub Release。
+SmartORM 使用 [Apache License 2.0](LICENSE)。当前开发线验证不代表已经完成 release、tag、Maven Central 发布或 GitHub Release。

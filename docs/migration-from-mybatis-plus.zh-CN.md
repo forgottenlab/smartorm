@@ -25,7 +25,7 @@
 - 添加本地模块前后都运行原应用及测试套件。
 - 记录当前依赖面：父 reactor 包含兼容 core 与合并式 Starter 子模块；core artifacts 排除 demo class/configuration/SQL，MPJ 保持传递，JSqlParser/Web/MySQL 按文档为 optional。
 
-当前限制：core 与开发版 Starter 都有隔离本地仓库使用方证据，包括离线复跑，但两者都没有经过验证的 Maven Central 发布。Hardened Starter feature SHA `18554e6` 已由 Draft PR #1 的 `pull_request` run `32653878401` 成功验证；真实项目接入仍未验证。这些证据只证明仓库与本地 dependency-only 路径，不代表公共安装可用。
+当前限制：core 与开发版 Starter 都有隔离本地仓库使用方证据，包括离线复跑，但两者都没有经过验证的 Maven Central 发布。参数绑定修复合并 checkpoint `093318aa46143f052cdf54b3183b0fda80eba4da` 已由成功的 `push/main` run `35074543269` 远程验证；完成真实项目接入仍未验证。这些证据只证明仓库与本地 dependency-only 路径，不代表公共安装可用。
 
 本地 2.1.x Starter 路径使用 `io.github.forgottenlab:smartorm-spring-boot-starter:2.1.0-SNAPSHOT`；它消除 SmartORM component/内部 Mapper 扫描，并基于无歧义的应用 session 基础设施精确注册内部 Mapper。应用继续只扫描自己的业务 Mapper。直接 core 路径仍为 `io.github.forgottenlab:smartorm:2.1.0-SNAPSHOT`，并保留显式 component/内部 Mapper 注册。
 

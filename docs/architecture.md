@@ -88,7 +88,7 @@ Configuration properties/metadata, declaration validation, a failure analyzer, a
 - MyBatis-Plus-Join remains a transitive dependency because `SmartMapper` exposes `MPJBaseMapper`.
 - JSqlParser is optional; Spring Web and MySQL Connector/J are runtime-optional rather than mandatory transitive consumer dependencies.
 - Demo code and runtime integration still live beside core semantics in the `smartorm` child, although demo classes/configuration/SQL are excluded from release artifacts.
-- The locally installed core artifact retains its earlier two-test consumer evidence. The development Starter additionally passed a one-test external Spring Boot consumer smoke and an offline repeat; Maven Central consumption and a real-project adoption remain unverified.
+- The locally installed core artifact retains its earlier two-test consumer evidence. The development Starter additionally passed a one-test external Spring Boot consumer smoke and an offline repeat. The parameter-binding merge checkpoint `093318aa` is remotely verified by `push/main` run `35074543269`; Maven Central consumption and completed real-project adoption remain unverified.
 - `SmartQuery` is public but inactive.
 - Wrapper and native paths do not share identical scalar-binding implementation.
 
@@ -98,7 +98,7 @@ These are compatibility constraints, not hidden implementation details.
 
 The roadmap now distinguishes the locally implemented Starter foundation from remaining product work:
 
-- 2.1.x: remotely validate the Starter foundation, plan a single-module real-project adoption, then separately design configuration, validation, and diagnostics.
+- 2.1.x: keep the merged and remotely verified Starter foundation stable, complete one bounded real-project adoption proof, then separately design configuration, validation, and diagnostics.
 - 2.2.x: focused API usability improvements after compatibility design.
 - 3.0: physical core/Spring/JOIN/demo separation and a `SmartMapper`/`SmartJoinMapper` boundary.
 
