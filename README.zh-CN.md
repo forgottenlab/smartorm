@@ -114,14 +114,15 @@ Starter 通过 Spring Boot `AutoConfiguration.imports` 发现，应用无需再�
 
 | 层级 | 范围 | 证据 |
 |---|---|---|
-| 数据库无关回归 | Native SQL 渲染/绑定与写操作安全 | 本轮 preflight：28/28 通过 |
+| 数据库无关回归 | 无 JOIN Wrapper 绑定、Native SQL 渲染/绑定与写操作安全 | 当前参数绑定 preflight：35/35 通过 |
 | Starter 上下文回归 | 内部 Mapper 注册、默认/显式应用扫描、兼容、session 选择与 backoff | 本轮 hardening：无数据库 21/21 通过 |
 | 外部 Starter 使用方 | 隔离本地 Maven 仓库、真实 `@EnableAutoConfiguration`、默认业务 Mapper 发现、无内部 package 引用 | 联网 1/1 通过，随后离线 1/1 通过 |
 | 历史 MySQL 双轮 | 两个独立创建的 `mysql:9.4.0` volume | 2026-07-20：两轮各 46/46，随后清理 |
 | 历史随机顺序探针 | 固定 seed `20260720` | 2026-07-20：46/46，随后清理 |
-| 本轮 MySQL release preflight | 全新 `smartorm-release-preflight` Compose 项目 | 2026-08-12：46/46；0 failures/errors/skips；container/network/volume 残留 0/0/0 |
+| 当前参数绑定 MySQL preflight | 全新 `smartorm-parameter-binding` Compose 项目 | 2026-09-16：47/47；真实 `BoundSql` 映射已验证；残留 0/0/0 |
+| 历史 MySQL release preflight | 全新 `smartorm-release-preflight` Compose 项目 | 2026-08-12：46/46；0 failures/errors/skips；残留 0/0/0 |
 | Starter hardening MySQL 回归 | 全新 `smartorm-starter-mapper-hardening` Compose 项目 | 2026-08-13：46/46；cleanup 残留 0/0/0 |
-| GitHub Actions | JDK 17、Starter 21、core 28、MySQL 46、package、报告与 cleanup | Foundation SHA `c6e8c8b`：精确 `push/main` run `31574822720` 通过；Starter SHA `18554e6`：Draft PR #1 的 `pull_request` run `32653878401` 成功完成 |
+| 最近的精确远程证据 | JDK 17、Starter 21、当时的 core 28 与 MySQL 46、package、报告与 cleanup | Foundation SHA `c6e8c8b`：精确 `push/main` run `31574822720` 通过；Starter SHA `18554e6`：Draft PR #1 的 `pull_request` run `32653878401` 成功完成；当前 35/47 数量仅有本地证据 |
 
 本地 preflight 还包含编译、package 与 artifact 检查。各层证据证明的边界不同，历史运行不会被当成本轮结果。详见[测试](docs/testing.zh-CN.md)。
 

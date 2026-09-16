@@ -114,14 +114,15 @@ The opt-in bypasses only the missing-effective-`WHERE` refusal. It does not add 
 
 | Layer | Scope | Evidence |
 |---|---|---|
-| Database-independent regressions | Native SQL rendering/binding and mutation safety | Current preflight: 28/28 passed |
+| Database-independent regressions | Non-JOIN Wrapper binding, Native SQL rendering/binding, and mutation safety | Current parameter-binding preflight: 35/35 passed |
 | Starter context regressions | Internal Mapper registration, default/explicit application scans, compatibility, session selection, backoff | Current hardening: 21/21 passed without a database |
 | External Starter consumer | Isolated local Maven repository, real `@EnableAutoConfiguration`, default business Mapper discovery, no internal-package reference | 1/1 passed online, then 1/1 offline |
 | Historical MySQL double-run | Two independently created `mysql:9.4.0` volumes | 2026-07-20: 46/46 twice, followed by cleanup |
 | Historical random-order probe | Fixed seed `20260720` | 2026-07-20: 46/46, followed by cleanup |
-| Current MySQL release preflight | Fresh `smartorm-release-preflight` Compose project | 2026-08-12: 46/46; 0 failures/errors/skips; container/network/volume residue 0/0/0 |
+| Current parameter-binding MySQL preflight | Fresh `smartorm-parameter-binding` Compose project | 2026-09-16: 47/47; real `BoundSql` mappings verified; residue 0/0/0 |
+| Historical MySQL release preflight | Fresh `smartorm-release-preflight` Compose project | 2026-08-12: 46/46; 0 failures/errors/skips; residue 0/0/0 |
 | Starter hardening MySQL regression | Fresh `smartorm-starter-mapper-hardening` Compose project | 2026-08-13: 46/46; cleanup residue 0/0/0 |
-| GitHub Actions | JDK 17, Starter 21, core 28, MySQL 46, package, reports, cleanup | Foundation SHA `c6e8c8b`: exact `push/main` run `31574822720` passed; Starter SHA `18554e6`: Draft PR #1 `pull_request` run `32653878401` completed successfully |
+| Last exact remote evidence | JDK 17, Starter 21, then-current core 28 and MySQL 46, package, reports, cleanup | Foundation SHA `c6e8c8b`: exact `push/main` run `31574822720` passed; Starter SHA `18554e6`: Draft PR #1 `pull_request` run `32653878401` completed successfully; current 35/47 counts remain local-only |
 
 Compilation, package, and artifact checks are also part of the local release preflight. Each layer proves a different boundary; historical runs are not presented as current evidence. See [Testing](docs/testing.md).
 

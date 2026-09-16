@@ -75,7 +75,8 @@ Annotation properties such as `fields`, `where`, `orderBy`, JOIN table/alias, an
 Runtime method arguments use numeric placeholders such as `#{0}`. Current paths differ:
 
 - Native/JOIN renderers convert placeholders into ordered MyBatis parameter bindings.
-- Wrapper-based paths currently render escaped scalar literals through `SmartExpressionUtil.fillExpression` before using Wrapper `apply`/`setSql` for expressions.
+- Non-JOIN `@SmartSelect` and the shared `@SmartPage`/`@SmartDelete` WHERE builder convert numeric method-argument placeholders into compact MyBatis-Plus `Wrapper.apply` bindings. Runtime values remain in Wrapper parameter state, including String and null values; repeated indexes reuse the same logical binding.
+- `@SmartUpdate` still has a separate WHERE implementation, and expression-style `setSql` values still use `SmartExpressionUtil.fillExpression`. Ordinary non-expression SET values continue to use Wrapper binding.
 
 Therefore, do not claim that every current path has identical prepared-statement binding semantics. Keep annotation structure static, validate input at the application boundary, and add regression tests for quotes, nulls, ordering, and database effects.
 
@@ -103,6 +104,6 @@ Database interceptors may provide defense in depth, but they do not replace the 
 
 ## Regression evidence
 
-`SmartMutationWhereSafetyTest` contains 18 database-independent tests covering blank/whitespace/`WHERE`-only conditions, runtime-disabled predicates, valid predicates, handler rejection, explicit opt-in, parameter order, and input immutability. The database suite separately verifies annotated update/delete behavior against disposable MySQL 9.4.0.
+`SmartQuerySupportBindingTest` contains seven database-independent tests covering integer, String, multiple, repeated, sparse/out-of-order, null, input immutability, and the non-JOIN Handler boundary with real MyBatis-Plus Wrapper state. `SmartMutationWhereSafetyTest` retains 18 tests for the mutation guard. The database suite separately verifies execution and final MyBatis `BoundSql` parameter mappings against disposable MySQL 9.4.0.
 
 See [Testing](testing.md) for exact evidence and commands.

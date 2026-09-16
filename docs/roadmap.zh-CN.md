@@ -17,11 +17,11 @@
 
 当前证据：
 
-- 28 个数据库无关测试在本地通过。
-- 本轮 2026-08-12 全新 MySQL 9.4.0 release preflight 通过 46/46，并把 container/network/volume 清理至 0/0/0。
+- 35 个数据库无关测试在本地通过，其中包含无 JOIN WHERE 运行时值的真实 Wrapper 绑定状态。
+- 当前 2026-09-16 全新 MySQL 9.4.0 参数绑定 preflight 通过 47/47，并把 container/network/volume 清理至 0/0/0。
 - 2026-07-20 两个独立 MySQL 运行与一轮固定 seed 随机顺序运行作为历史证据保留。
 - 普通主 JAR、sources、Javadoc、独立许可证、隔离 install 与外部使用方 smoke 已在本地验证。
-- Foundation SHA `c6e8c8b` 的精确 GitHub Actions `push/main` 运行 `31574822720` 已通过 28 测试、MySQL 46 测试、package、报告与 cleanup 门禁。
+- Foundation SHA `c6e8c8b` 的精确 GitHub Actions `push/main` 运行 `31574822720` 已通过当时的 28 测试、MySQL 46 测试、package、报告与 cleanup 门禁；当前 35/47 只有本地证据。
 - 签名/仓库设置、Maven Central 发布、tag 与 release 仍待完成。
 
 ## 🚀 In Progress — 2.1.x 接入体验

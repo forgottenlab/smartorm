@@ -17,11 +17,11 @@ Goals:
 
 Current evidence:
 
-- 28 database-independent tests pass locally.
-- The current 2026-08-12 fresh MySQL 9.4.0 release preflight passes 46/46 and cleans container/network/volume state to 0/0/0.
+- 35 database-independent tests pass locally, including real Wrapper binding state for non-JOIN WHERE values.
+- The current 2026-09-16 fresh MySQL 9.4.0 parameter-binding preflight passes 47/47 and cleans container/network/volume state to 0/0/0.
 - Two independent 2026-07-20 MySQL runs and one fixed-seed randomized-order run remain historical evidence.
 - An ordinary main JAR, sources, Javadoc, standalone license, isolated install, and external consumer smoke are locally verified.
-- The exact GitHub Actions `push/main` run `31574822720` for Foundation SHA `c6e8c8b` passed the 28-test, MySQL 46-test, package, report, and cleanup gates.
+- The exact GitHub Actions `push/main` run `31574822720` for Foundation SHA `c6e8c8b` passed the then-current 28-test, MySQL 46-test, package, report, and cleanup gates; current 35/47 evidence is local-only.
 - Signing/repository setup, Maven Central publication, tag, and release remain open.
 
 ## 🚀 In Progress — 2.1.x Adoption Experience

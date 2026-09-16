@@ -2,7 +2,14 @@ package io.github.forgottenlab.smartorm.support.query;
 
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import io.github.forgottenlab.smartorm.util.SmartExpressionUtil;
+import io.github.forgottenlab.smartorm.exception.SmartOrmException;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:wangheran55@gmail.com">ForgottenLab</a>
@@ -12,6 +19,8 @@ import io.github.forgottenlab.smartorm.util.SmartExpressionUtil;
  * @VersionHistory 详细请查看 CHANGELOG.md
  */
 public final class SmartQuerySupport {
+
+    private static final Pattern METHOD_ARGUMENT_PLACEHOLDER = Pattern.compile("#\\{(\\d+)}");
 
     private SmartQuerySupport() {
     }
@@ -44,14 +53,42 @@ public final class SmartQuerySupport {
             return;
         }
 
-        String realWhere;
-        if (args == null || args.length == 0) {
-            realWhere = where;
-        } else {
-            realWhere = SmartExpressionUtil.fillExpression(where, args);
+        Matcher matcher = METHOD_ARGUMENT_PLACEHOLDER.matcher(where);
+        if (!matcher.find()) {
+            wrapper.apply(where);
+            return;
         }
 
-        wrapper.apply(realWhere);
+        matcher.reset();
+        StringBuffer applySql = new StringBuffer();
+        Map<Integer, Integer> applyIndexes = new LinkedHashMap<>();
+        List<Object> boundValues = new ArrayList<>();
+
+        while (matcher.find()) {
+            int methodArgIndex = Integer.parseInt(matcher.group(1));
+            if (args == null || methodArgIndex >= args.length) {
+                int argumentCount = args == null ? 0 : args.length;
+                throw new SmartOrmException(
+                        "SQL 参数索引越界: #{" + methodArgIndex + "}, 可用参数数量: " + argumentCount
+                );
+            }
+
+            // Method indexes can be sparse or reordered; Wrapper.apply requires compact {n} indexes.
+            Integer applyIndex = applyIndexes.get(methodArgIndex);
+            if (applyIndex == null) {
+                applyIndex = boundValues.size();
+                applyIndexes.put(methodArgIndex, applyIndex);
+                boundValues.add(args[methodArgIndex]);
+            }
+
+            matcher.appendReplacement(
+                    applySql,
+                    Matcher.quoteReplacement("{" + applyIndex + "}")
+            );
+        }
+        matcher.appendTail(applySql);
+
+        wrapper.apply(applySql.toString(), boundValues.toArray());
     }
 
     /**

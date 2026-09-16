@@ -19,7 +19,7 @@
 - `SmartUpdate` / `SmartDelete` 现在基于最终结构化 WHERE 谓词默认拒绝无条件全表操作；此前依赖空 WHERE 的调用需要显式设置 `allowFullTable = true`。
 - 公开文档明确将 SmartORM 定位为 Spring Boot 与 MyBatis-Plus 的按需增强，而不是 MyBatis、MyBatis-Plus、Wrapper、XML、Provider 或 MPJ 的替代品。
 - 双语 README 采用对齐的 GitHub Hero、真实 badge、能力/适用场景/测试证据表格与安全提示；公开文档统一语言切换、摘要和可扫读标题层级。
-- Testing 与 Release Checklist 现在明确区分本轮全新 MySQL 46/46 本地 preflight、保留的历史数据库证据，以及 main 与 hardened Starter feature checkpoint 的精确 SHA 远程 CI。
+- Testing 与 Release Checklist 现在明确区分当前参数绑定 35/47 本地 preflight、保留的历史数据库证据，以及 main 与 hardened Starter feature checkpoint 的精确 SHA 远程 CI。
 - 数据库测试改为显式激活隔离 `test` profile，并强化确定性 fixture、行数、分页、异常和 JOIN 断言。
 - 原根 `src` 机械迁入 `smartorm` 子模块，文件内容哈希、现有 artifactId、Java package 与公开 API 保持不变。
 - Core 发布 artifacts 排除 demo class、`application.yaml` 与 demo SQL；demo 源码仍保留在 `smartorm` 子模块中。
@@ -30,6 +30,7 @@
 ### Fixed
 - 修复 Native SQL 使用原方法参数索引访问紧凑绑定列表导致的乱序/稀疏参数错误。
 - 修复显式 JOIN `ON` 被整体当作标量参数的问题；结构保留为受控 SQL 谓词，其中运行时标量继续绑定。
+- 修复无 JOIN `@SmartSelect.where`（以及共享构建器的 `@SmartPage` / `@SmartDelete` WHERE）把运行时参数渲染为 SQL 字面量的问题；公开 `#{n}` 语法保持不变，运行时值改由 MyBatis-Plus Wrapper 参数绑定。`@SmartUpdate` 的独立路径不在本次变更内。
 
 ### Notes
 - `2.1.0-SNAPSHOT` Starter 仍是未在 Maven Central 发布的开发 foundation；hardened feature SHA `18554e6` 已 push，Draft PR #1 的 `pull_request` run `32653878401` 已成功完成，但 PR 尚未 merge，也没有 tag 或 release。

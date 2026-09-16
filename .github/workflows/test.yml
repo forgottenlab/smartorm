@@ -36,7 +36,7 @@ jobs:
         run: >-
           mvn -B
           -pl smartorm
-          -Dtest=SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest
+          -Dtest=SmartQuerySupportBindingTest,SmartMutationWhereSafetyTest,SmartNativeSqlRendererTest
           test
 
       - name: Run Starter auto-configuration tests
